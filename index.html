@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <base target="_top">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+
+  <title>Aduan Jalan Rusak</title>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+
+      font-family: Arial, sans-serif;
+
+      background: #f3f6f7;
+
+      margin: 0;
+
+      padding: 20px;
+
+    }
+
+
+    .container {
+
+      max-width: 600px;
+
+      margin: auto;
+
+    }
+
+
+    .header {
+
+      background: #1F6366;
+
+      color: white;
+
+      padding: 20px;
+
+      border-radius: 12px 12px 0 0;
+
+    }
+
+
+    .header h2 {
+
+      margin: 0 0 7px 0;
+
+      font-size: 22px;
+
+    }
+
+
+    .header div {
+
+      font-size: 14px;
+
+      line-height: 1.5;
+
+    }
+
+
+    .card {
+
+      background: white;
+
+      padding: 20px;
+
+      border-radius: 0 0 12px 12px;
+
+      box-shadow: 0 3px 10px rgba(0,0,0,.08);
+
+    }
+
+
+    label {
+
+      display: block;
+
+      margin-top: 15px;
+
+      margin-bottom: 6px;
+
+      font-weight: bold;
+
+    }
+
+
+    input,
+    textarea {
+
+      width: 100%;
+
+      padding: 12px;
+
+      border: 1px solid #ccc;
+
+      border-radius: 8px;
+
+      font-size: 15px;
+
+    }
+
+
+    textarea {
+
+      min-height: 120px;
+
+      resize: vertical;
+
+    }
+
+
+    button {
+
+      width: 100%;
+
+      padding: 14px;
+
+      border: none;
+
+      border-radius: 8px;
+
+      font-size: 16px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+
+      margin-top: 15px;
+
+    }
+
+
+    button:disabled {
+
+      opacity: .6;
+
+      cursor: not-allowed;
+
+    }
+
+
+    .location {
+
+      background: #198754;
+
+      color: white;
+
+    }
+
+
+    .submit {
+
+      background: #1F6366;
+
+      color: white;
+
+    }
+
+
+    .location-info {
+
+      background: #eef7f7;
+
+      padding: 12px;
+
+      border-radius: 8px;
+
+      margin-top: 10px;
+
+      font-size: 14px;
+
+      line-height: 1.5;
+
+    }
+
+
+    .photo-info {
+
+      background: #f7f7f7;
+
+      padding: 10px;
+
+      border-radius: 8px;
+
+      margin-top: 8px;
+
+      font-size: 13px;
+
+      color: #555;
+
+    }
+
+
+    .success {
+
+      display: none;
+
+      background: #d1e7dd;
+
+      color: #0f5132;
+
+      padding: 15px;
+
+      border-radius: 8px;
+
+      margin-bottom: 15px;
+
+      line-height: 1.5;
+
+    }
+
+
+    .error {
+
+      color: #b02a37;
+
+      margin-top: 10px;
+
+      font-size: 14px;
+
+    }
+
+
+    .required {
+
+      color: red;
+
+    }
+
+
+    .divider {
+
+      border: 0;
+
+      border-top: 1px solid #eee;
+
+      margin: 20px 0;
+
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    <h2>📢 Aduan Jalan Rusak</h2>
+
+    <div>
+
+      Silakan sampaikan laporan kerusakan jalan
+
+      kepada kami. Lengkapi data dan lokasi kerusakan.
+
+    </div>
+
+  </div>
+
+
+
+  <div class="card">
+
+
+    <!-- SUCCESS -->
+
+    <div id="success"
+         class="success">
+
+      <strong>✅ Aduan berhasil dikirim.</strong>
+
+      <br><br>
+
+      Nomor Aduan:
+
+      <strong id="nomorAduan"></strong>
+
+      <br><br>
+
+      <a id="linkMaps"
+         href="#"
+         target="_blank">
+
+        📍 Lihat Lokasi di Google Maps
+
+      </a>
+
+    </div>
+
+
+
+    <!-- FORM -->
+
+    <form id="formAduan">
+
+
+      <!-- NAMA -->
+
+      <label>
+
+        Nama Pelapor
+
+        <span class="required">*</span>
+
+      </label>
+
+      <input
+
+        type="text"
+
+        id="nama"
+
+        required
+
+        placeholder="Nama Anda">
+
+
+
+      <!-- KONTAK -->
+
+      <label>
+
+        Kontak/WA
+
+        <span class="required">*</span>
+
+      </label>
+
+      <input
+
+        type="tel"
+
+        id="hp"
+
+        required
+
+        placeholder="08xxxxxxxxxx">
+
+
+
+           <!-- RUAS JALAN -->
+
+      <label>
+
+        Ruas/Lokasi Jalan
+
+        <span class="required">*</span>
+
+      </label>
+
+      <input
+
+        type="text"
+
+        id="ruas"
+
+        required
+
+        placeholder="Contoh: Jl. Cibiru – Cinunuk">
+
+
+
+      <!-- KECAMATAN (BARU) -->
+
+      <label>
+
+        Kecamatan
+
+      </label>
+
+      <input
+
+        type="text"
+
+        id="kecamatan"
+
+        placeholder="Contoh: Cileunyi">
+
+
+
+      <!-- DESA/KELURAHAN (BARU) -->
+
+      <label>
+
+        Desa/Kelurahan
+
+      </label>
+
+      <input
+
+        type="text"
+
+        id="desa"
+
+        placeholder="Contoh: Cinunuk">
+
+
+
+      <!-- DESKRIPSI -->
+
+      <label>
+
+        Deskripsi Pengaduan
+
+        <span class="required">*</span>
+
+      </label>
+
+      <textarea
+
+        id="uraian"
+
+        required
+
+        placeholder="Jelaskan kondisi kerusakan jalan, misalnya jalan berlubang, retak, amblas, aspal terkelupas, dan lain-lain."></textarea>
+
+
+      <!-- LOKASI -->
+
+      <label>
+
+        Lokasi Kerusakan
+
+        <span class="required">*</span>
+
+      </label>
+
+
+      <button
+
+        type="button"
+
+        class="location"
+
+        onclick="ambilLokasi()">
+
+        📍 AMBIL LOKASI SAYA
+
+      </button>
+
+
+      <div
+
+        id="lokasiInfo"
+
+        class="location-info">
+
+        Lokasi belum diambil.
+
+      </div>
+
+
+      <input
+
+        type="hidden"
+
+        id="latitude">
+
+
+      <input
+
+        type="hidden"
+
+        id="longitude">
+
+
+
+      <!-- FOTO -->
+
+      <label>
+
+        Foto Kerusakan
+
+        <span class="required">*</span>
+
+      </label>
+
+
+      <input
+
+        type="file"
+
+        id="foto"
+
+        accept="image/*"
+
+        capture="environment"
+
+        required>
+
+
+      <div class="photo-info">
+
+        📷 Silakan ambil foto kondisi kerusakan jalan.
+
+        Maksimal ukuran foto 5 MB.
+
+      </div>
+
+
+
+      <!-- ERROR -->
+
+      <div
+
+        id="error"
+
+        class="error">
+
+      </div>
+
+
+
+      <hr class="divider">
+
+
+
+      <!-- SUBMIT -->
+
+      <button
+
+        type="submit"
+
+        class="submit">
+
+        📤 KIRIM ADUAN
+
+      </button>
+
+
+    </form>
+
+
+  </div>
+
+</div>
+
+
+
+<script>
+
+
+// =====================================================
+// URL GOOGLE APPS SCRIPT API
+// =====================================================
+
+const URL_APPS_SCRIPT =
+  'https://script.google.com/macros/s/AKfycbz1GDXRcX6JynPX7RiuNyrGRI-8lPctyh593M2nYn1MbMEYqxwCqRIa0i3KYzJKizHX7g/exec';
+  
+
+
+// =====================================================
+// MENGAMBIL GPS
+// =====================================================
+
+function ambilLokasi() {
+
+  const info =
+    document.getElementById('lokasiInfo');
+
+  const error =
+    document.getElementById('error');
+
+
+  error.innerHTML = '';
+
+
+  info.innerHTML =
+    '⏳ Sedang mengambil lokasi...';
+
+
+  if (!navigator.geolocation) {
+
+    error.innerHTML =
+      'Perangkat Anda tidak mendukung GPS.';
+
+    return;
+
+  }
+
+
+  navigator.geolocation.getCurrentPosition(
+
+    function(position) {
+
+      const lat =
+        position.coords.latitude;
+
+      const lng =
+        position.coords.longitude;
+
+
+      document.getElementById('latitude')
+        .value = lat;
+
+
+      document.getElementById('longitude')
+        .value = lng;
+
+
+      info.innerHTML =
+
+        '✅ Lokasi berhasil diambil' +
+
+        '<br><br>' +
+
+        '<strong>Latitude:</strong> ' +
+
+        lat +
+
+        '<br>' +
+
+        '<strong>Longitude:</strong> ' +
+
+        lng +
+
+        '<br><br>' +
+
+        '<a href="https://www.google.com/maps?q=' +
+
+        lat + ',' + lng +
+
+        '" target="_blank">' +
+
+        '📍 Cek lokasi di Google Maps' +
+
+        '</a>';
+
+    },
+
+
+    function(errorGPS) {
+
+      let pesan =
+        'Lokasi tidak dapat diambil. ';
+
+
+      if (errorGPS.code === 1) {
+
+        pesan +=
+          'Silakan izinkan akses lokasi pada browser.';
+
+      }
+
+      else if (errorGPS.code === 2) {
+
+        pesan +=
+          'GPS tidak tersedia.';
+
+      }
+
+      else if (errorGPS.code === 3) {
+
+        pesan +=
+          'Pengambilan lokasi terlalu lama.';
+
+      }
+
+
+      error.innerHTML =
+        pesan;
+
+
+      info.innerHTML =
+        '❌ Lokasi belum tersedia.';
+
+    },
+
+
+    {
+
+      enableHighAccuracy: true,
+
+      timeout: 15000,
+
+      maximumAge: 0
+
+    }
+
+  );
+
+}
+
+
+// =====================================================
+// MEMBACA FOTO
+// =====================================================
+
+function bacaFoto(file) {
+
+  return new Promise(function(resolve, reject) {
+
+    const reader =
+      new FileReader();
+
+
+    reader.onload = function(e) {
+
+      const base64 =
+        e.target.result.split(',')[1];
+
+
+      resolve({
+
+        fileName: file.name,
+
+        mimeType: file.type,
+
+        data: base64
+
+      });
+
+    };
+
+
+    reader.onerror = function() {
+
+      reject(
+        new Error('Foto tidak dapat dibaca.')
+      );
+
+    };
+
+
+    reader.readAsDataURL(file);
+
+  });
+
+}
+
+
+// =====================================================
+// SUBMIT FORM
+// =====================================================
+
+document
+
+  .getElementById('formAduan')
+
+  .addEventListener(
+
+    'submit',
+
+    async function(e) {
+
+      e.preventDefault();
+
+
+      const error =
+        document.getElementById('error');
+
+
+      error.innerHTML = '';
+
+
+      // -----------------------------------------------
+      // CEK LOKASI
+      // -----------------------------------------------
+
+      const lat =
+        document.getElementById('latitude').value;
+
+
+      const lng =
+        document.getElementById('longitude').value;
+
+
+      if (!lat || !lng) {
+
+        error.innerHTML =
+          '⚠️ Silakan ambil lokasi terlebih dahulu.';
+
+        return;
+
+      }
+
+
+      // -----------------------------------------------
+      // CEK FOTO
+      // -----------------------------------------------
+
+      const fotoInput =
+        document.getElementById('foto');
+
+
+      if (!fotoInput.files.length) {
+
+        error.innerHTML =
+          '⚠️ Silakan pilih atau ambil foto kerusakan.';
+
+        return;
+
+      }
+
+
+      const file =
+        fotoInput.files[0];
+
+
+      // -----------------------------------------------
+      // CEK UKURAN FOTO
+      // -----------------------------------------------
+
+      if (file.size > 5 * 1024 * 1024) {
+
+        error.innerHTML =
+          '⚠️ Ukuran foto maksimal 5 MB.';
+
+        return;
+
+      }
+
+
+      // -----------------------------------------------
+      // BACA FOTO
+      // -----------------------------------------------
+
+      let foto;
+
+
+      try {
+
+        foto =
+          await bacaFoto(file);
+
+      }
+
+      catch (err) {
+
+        error.innerHTML =
+          '❌ ' + err.message;
+
+        return;
+
+      }
+
+
+         // -----------------------------------------------
+      // DATA FORM
+      // -----------------------------------------------
+
+      const data = {
+
+        nama:
+          document.getElementById('nama').value,
+
+        hp:
+          document.getElementById('hp').value,
+
+        ruas:
+          document.getElementById('ruas').value,
+
+        kecamatan:
+          document.getElementById('kecamatan').value,
+
+        desa:
+          document.getElementById('desa').value,
+
+        uraian:
+          document.getElementById('uraian').value,
+
+        latitude:
+          lat,
+
+        longitude:
+          lng,
+
+        foto:
+          foto
+
+      };
+
+
+      // -----------------------------------------------
+      // TOMBOL
+      // -----------------------------------------------
+
+      const tombol =
+        document.querySelector('.submit');
+
+
+      tombol.disabled = true;
+
+
+      tombol.innerHTML =
+        '⏳ Mengirim aduan...';
+
+
+      // -----------------------------------------------
+      // KIRIM KE GOOGLE APPS SCRIPT
+      // -----------------------------------------------
+
+      try {
+
+        const response =
+
+          await fetch(
+
+            URL_APPS_SCRIPT,
+
+            {
+
+              method: 'POST',
+
+              body: JSON.stringify(data)
+
+            }
+
+          );
+
+
+        // ---------------------------------------------
+        // BACA RESPONSE
+        // ---------------------------------------------
+
+        const result =
+          await response.json();
+
+
+        // ---------------------------------------------
+        // JIKA GAGAL
+        // ---------------------------------------------
+
+        if (!result.berhasil) {
+
+          throw new Error(
+            result.pesan ||
+            'Data gagal disimpan.'
+          );
+
+        }
+
+
+        // ---------------------------------------------
+        // RESET FORM
+        // ---------------------------------------------
+
+        document
+
+          .getElementById('formAduan')
+
+          .reset();
+
+
+        document
+
+          .getElementById('latitude')
+
+          .value = '';
+
+
+        document
+
+          .getElementById('longitude')
+
+          .value = '';
+
+
+        document
+
+          .getElementById('lokasiInfo')
+
+          .innerHTML =
+            'Lokasi belum diambil.';
+
+
+        // ---------------------------------------------
+        // TAMPILKAN SUKSES
+        // ---------------------------------------------
+
+        document
+
+          .getElementById('success')
+
+          .style.display = 'block';
+
+
+        document
+
+          .getElementById('nomorAduan')
+
+          .innerHTML =
+            result.nomor;
+
+
+        document
+
+          .getElementById('linkMaps')
+
+          .href =
+            result.maps;
+
+
+        // ---------------------------------------------
+        // KEMBALIKAN TOMBOL
+        // ---------------------------------------------
+
+        tombol.disabled = false;
+
+
+        tombol.innerHTML =
+          '📤 KIRIM ADUAN';
+
+
+        // ---------------------------------------------
+        // SCROLL KE ATAS
+        // ---------------------------------------------
+
+        window.scrollTo({
+
+          top: 0,
+
+          behavior: 'smooth'
+
+        });
+
+
+      }
+
+
+      catch (err) {
+
+        // ---------------------------------------------
+        // ERROR
+        // ---------------------------------------------
+
+        document
+
+          .getElementById('error')
+
+          .innerHTML =
+
+            '❌ Gagal mengirim aduan: ' +
+
+            err.message;
+
+
+        tombol.disabled = false;
+
+
+        tombol.innerHTML =
+          '📤 KIRIM ADUAN';
+
+      }
+
+    }
+
+  );
+
+</script>
+
+
+</body>
+
+</html>
