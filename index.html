@@ -232,79 +232,6 @@
 .btn-save, .btn-cancel {
   margin: 2px;
 }
-        /* PERBAIKAN 1: Tampilan Keterangan yang Menonjol */
-    .keterangan-box {
-      padding: 12px;
-      border-radius: 6px;
-      font-weight: 500;
-      border-left: 4px solid currentColor;
-      margin-top: 5px;
-    }
-    .keterangan-positif { background: #d1e7dd; color: #0f5132; }
-    .keterangan-negatif { background: #f8d7da; color: #842029; }
-    .keterangan-netral { background: #fff3cd; color: #856404; }
-
-    /* PERBAIKAN 2: Admin Dashboard Mobile Responsive (Card View) */
-    @media (max-width: 768px) {
-      .table-responsive table, 
-      .table-responsive thead, 
-      .table-responsive tbody, 
-      .table-responsive th, 
-      .table-responsive td, 
-      .table-responsive tr {
-        display: block;
-      }
-      .table-responsive thead tr {
-        position: absolute;
-        top: -9999px;
-        left: -9999px;
-      }
-      .table-responsive tr {
-        border: 1px solid #ddd;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        background: #fff;
-        padding: 15px 15px 15px 45%; /* Ruang untuk label di kiri */
-        position: relative;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      }
-      .table-responsive td {
-        border: none;
-        position: relative;
-        padding: 8px 0;
-        text-align: right;
-        border-bottom: 1px solid #f0f0f0;
-      }
-      .table-responsive td:last-child {
-        border-bottom: none;
-        text-align: center;
-        padding-top: 15px;
-      }
-      .table-responsive td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 0;
-        width: 40%;
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
-        font-weight: bold;
-        color: #1F6366;
-        font-size: 13px;
-      }
-      /* Penyesuaian Mode Edit di Mobile */
-      .edit-mode {
-        text-align: left !important;
-        padding-left: 0 !important;
-      }
-      .edit-mode:before {
-        display: none; /* Sembunyikan label saat mode edit */
-      }
-      .edit-mode select, .edit-mode input {
-        width: 100%;
-        margin-top: 5px;
-      }
-    }
   </style>
 </head>
 
@@ -484,44 +411,6 @@ const ADMIN_PASS = 'admin123'; // Ganti dengan password Anda
 
 let currentUser = '';
 
-  // =====================================================
-// FITUR AUTO-SAVE DRAFT FORM (ANTI HILANG)
-// =====================================================
-document.addEventListener('DOMContentLoaded', function() {
-  // 1. Load draft form jika ada
-  const formInputs = document.querySelectorAll('#formAduan input, #formAduan textarea');
-  formInputs.forEach(input => {
-    if (input.type !== 'file') { // Jangan load file
-      const savedValue = localStorage.getItem('draft_' + input.id);
-      if (savedValue) input.value = savedValue;
-      
-      // Simpan setiap kali diketik
-      input.addEventListener('input', function() {
-        localStorage.setItem('draft_' + this.id, this.value);
-      });
-    }
-  });
-
-  // 2. Load riwayat pencarian tracking
-  const lastHp = localStorage.getItem('lastSearchedHp');
-  if (lastHp) {
-    document.getElementById('cariHp').value = lastHp;
-  }
-});
-
-// Modifikasi sedikit fungsi submit form untuk menghapus draft setelah berhasil
-// CARI bagian: showAlert('formAlert', '✅ Aduan berhasil dikirim!...', 'success');
-// DAN TAMBAHKAN kode ini tepat di bawahnya:
-/*
-  // Hapus draft setelah berhasil kirim
-  localStorage.removeItem('draft_nama');
-  localStorage.removeItem('draft_hp');
-  localStorage.removeItem('draft_ruas');
-  localStorage.removeItem('draft_kecamatan');
-  localStorage.removeItem('draft_desa');
-  localStorage.removeItem('draft_uraian');
-*/
-
 // =====================================================
 // NAVIGASI SECTION
 // =====================================================
@@ -692,21 +581,12 @@ function cariAduan() {
     return;
   }
   
-  // Simpan riwayat pencarian agar tidak kosong saat buka ulang
-  localStorage.setItem('lastSearchedHp', hp);
-  
   btn.disabled = true;
   btn.innerHTML = '⏳ Mencari...';
   resultDiv.innerHTML = '';
   
-  fetch(URL_APPS_SCRIPT + '?action=getAduanByHp&hp=' + encodeURIComponent(hp), {
-    method: 'GET',
-    mode: 'cors'
-  })
-    .then(res => {
-      if (!res.ok) throw new Error('HTTP error! status: ' + res.status);
-      return res.json();
-    })
+  fetch(URL_APPS_SCRIPT + '?action=getAduanByHp&hp=' + encodeURIComponent(hp))
+    .then(res => res.json())
     .then(data => {
       btn.disabled = false;
       btn.innerHTML = '🔍 CARI ADUAN';
@@ -717,35 +597,23 @@ function cariAduan() {
       }
       
       if (!data.data || data.data.length === 0) {
-        showAlert('trackingAlert', '⚠️ Tidak ada aduan dengan nomor tersebut.', 'error');
+        showAlert('trackingAlert', '️ Tidak ada aduan dengan nomor tersebut.', 'error');
         return;
       }
       
       let html = '<div class="tracking-result">';
       data.data.forEach((aduan, idx) => {
-        // Tentukan warna keterangan berdasarkan status
-        let ketClass = 'keterangan-netral';
-        if (aduan.statusPenanganan === 'Ditolak' || aduan.statusVerifikasi === 'Tidak Valid') {
-          ketClass = 'keterangan-negatif';
-        } else if (aduan.statusPenanganan === 'Selesai' || aduan.statusVerifikasi === 'Valid') {
-          ketClass = 'keterangan-positif';
-        }
-        
-        const ketText = aduan.keterangan ? aduan.keterangan : 'Belum ada catatan dari petugas.';
-
         html += '<div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">';
-        html += '<h3 style="color: #1F6366; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Aduan #' + aduan.nomor + '</h3>';
+        html += '<h3 style="color: #1F6366; margin-bottom: 10px;">Aduan #' + aduan.nomor + '</h3>';
         html += '<div class="info-row"><div class="info-label">Tanggal:</div><div>' + formatDate(aduan.tanggal) + '</div></div>';
+        html += '<div class="info-row"><div class="info-label">Nama:</div><div>' + aduan.nama + '</div></div>';
         html += '<div class="info-row"><div class="info-label">Lokasi:</div><div>' + aduan.ruas + '</div></div>';
+        html += '<div class="info-row"><div class="info-label">Deskripsi:</div><div>' + aduan.uraian + '</div></div>';
         html += '<div class="info-row"><div class="info-label">Status Verifikasi:</div><div>' + getStatusBadge(aduan.statusVerifikasi, 'verif') + '</div></div>';
         html += '<div class="info-row"><div class="info-label">Status Penanganan:</div><div>' + getStatusBadge(aduan.statusPenanganan, 'handle') + '</div></div>';
-        
-        // Tampilan Keterangan yang Dipercantik
-        html += '<div class="info-row">';
-        html += '  <div class="info-label">📌 Keterangan dari Petugas:</div>';
-        html += '  <div class="keterangan-box ' + ketClass + '">' + ketText + '</div>';
-        html += '</div>';
-        
+        if (aduan.tanggalValidasi) html += '<div class="info-row"><div class="info-label">Tanggal Validasi:</div><div>' + formatDate(aduan.tanggalValidasi) + '</div></div>';
+        if (aduan.divalidasiOleh) html += '<div class="info-row"><div class="info-label">Divalidasi Oleh:</div><div>' + aduan.divalidasiOleh + '</div></div>';
+        if (aduan.keterangan) html += '<div class="info-row"><div class="info-label">Keterangan:</div><div style="background: #fff3cd; padding: 10px; border-radius: 5px;">' + aduan.keterangan + '</div></div>';
         html += '</div>';
       });
       html += '</div>';
@@ -816,7 +684,7 @@ function renderAdminTable(data) {
   tbody.innerHTML = '';
   
   if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; padding: 20px;">Tidak ada data</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data</td></tr>';
     return;
   }
   
@@ -826,18 +694,18 @@ function renderAdminTable(data) {
     tr.dataset.rowIndex = row.rowIndex;
     
     tr.innerHTML = `
-      <td data-label="No Aduan">${row.nomor}</td>
-      <td data-label="Tanggal">${formatDate(row.tanggal)}</td>
-      <td data-label="Nama">${row.nama}</td>
-      <td data-label="Kontak">${row.hp}</td>
-      <td data-label="Lokasi">${row.ruas}</td>
-      <td data-label="Deskripsi" title="${row.uraian}">${row.uraian ? row.uraian.substring(0, 40) + (row.uraian.length > 40 ? '...' : '') : '-'}</td>
-      <td data-label="Status Verif" class="view-mode">${getStatusBadge(row.statusVerifikasi, 'verif')}</td>
-      <td data-label="Status Handle" class="view-mode">${getStatusBadge(row.statusPenanganan, 'handle')}</td>
-      <td data-label="Tgl Update" class="view-mode">${formatDate(row.tanggalValidasi)}</td>
-      <td data-label="Keterangan" class="view-mode">${row.keterangan || '-'}</td>
-      <td data-label="Aksi">
-        <button class="btn-warning btn-edit" onclick="enableEdit(${row.rowIndex})" style="padding: 8px 12px; font-size: 13px; width: 100%;">✏️ Edit / Verifikasi</button>
+      <td>${row.nomor}</td>
+      <td>${formatDate(row.tanggal)}</td>
+      <td>${row.nama}</td>
+      <td>${row.hp}</td>
+      <td>${row.ruas}</td>
+      <td title="${row.uraian}">${row.uraian ? row.uraian.substring(0, 50) + (row.uraian.length > 50 ? '...' : '') : '-'}</td>
+      <td class="view-mode">${getStatusBadge(row.statusVerifikasi, 'verif')}</td>
+      <td class="view-mode">${getStatusBadge(row.statusPenanganan, 'handle')}</td>
+      <td class="view-mode">${formatDate(row.tanggalValidasi)}</td>
+      <td class="view-mode">${row.keterangan || '-'}</td>
+      <td>
+        <button class="btn-warning btn-edit" onclick="enableEdit(${row.rowIndex})" style="padding: 6px 10px; font-size: 12px;">✏️ Edit</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -951,7 +819,6 @@ if (localStorage.getItem('adminLogged')) {
   currentUser = localStorage.getItem('adminUser') || 'admin';
   showAdminDashboard();
 }
-
 </script>
 
 </body>
