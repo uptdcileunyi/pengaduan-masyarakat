@@ -1,1075 +1,828 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
-
-  <base target="_top">
-
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
-
-  <title>Aduan Jalan Rusak</title>
-
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aduan Jalan Rusak - Sistem Pengaduan Masyarakat</title>
   <style>
-
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-
-      font-family: Arial, sans-serif;
-
+      font-family: 'Segoe UI', Arial, sans-serif;
       background: #f3f6f7;
-
-      margin: 0;
-
-      padding: 20px;
-
+      color: #333;
     }
 
-
-    .container {
-
-      max-width: 600px;
-
-      margin: auto;
-
-    }
-
-
-    .header {
-
+    /* NAVBAR */
+    .navbar {
       background: #1F6366;
-
       color: white;
-
-      padding: 20px;
-
-      border-radius: 12px 12px 0 0;
-
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-
-
-    .header h2 {
-
-      margin: 0 0 7px 0;
-
-      font-size: 22px;
-
-    }
-
-
-    .header div {
-
-      font-size: 14px;
-
-      line-height: 1.5;
-
-    }
-
-
-    .card {
-
-      background: white;
-
-      padding: 20px;
-
-      border-radius: 0 0 12px 12px;
-
-      box-shadow: 0 3px 10px rgba(0,0,0,.08);
-
-    }
-
-
-    label {
-
-      display: block;
-
-      margin-top: 15px;
-
-      margin-bottom: 6px;
-
-      font-weight: bold;
-
-    }
-
-
-    input,
-    textarea {
-
-      width: 100%;
-
-      padding: 12px;
-
-      border: 1px solid #ccc;
-
-      border-radius: 8px;
-
-      font-size: 15px;
-
-    }
-
-
-    textarea {
-
-      min-height: 120px;
-
-      resize: vertical;
-
-    }
-
-
-    button {
-
-      width: 100%;
-
-      padding: 14px;
-
+    .navbar h1 { font-size: 20px; }
+    .nav-menu { display: flex; gap: 10px; flex-wrap: wrap; }
+    .nav-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
       border: none;
-
+      padding: 10px 18px;
       border-radius: 8px;
-
-      font-size: 16px;
-
-      font-weight: bold;
-
       cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    .nav-btn:hover, .nav-btn.active {
+      background: white;
+      color: #1F6366;
+    }
 
+    /* CONTAINER */
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    /* SECTIONS */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* CARD */
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      color: #1F6366;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    /* FORM */
+    label {
+      display: block;
       margin-top: 15px;
-
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #444;
     }
-
-
-    button:disabled {
-
-      opacity: .6;
-
-      cursor: not-allowed;
-
-    }
-
-
-    .location {
-
-      background: #198754;
-
-      color: white;
-
-    }
-
-
-    .submit {
-
-      background: #1F6366;
-
-      color: white;
-
-    }
-
-
-    .location-info {
-
-      background: #eef7f7;
-
+    input, select, textarea {
+      width: 100%;
       padding: 12px;
-
+      border: 1px solid #ccc;
       border-radius: 8px;
-
+      font-size: 15px;
+      font-family: inherit;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
       margin-top: 10px;
-
-      font-size: 14px;
-
-      line-height: 1.5;
-
+      transition: all 0.3s;
     }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-primary { background: #1F6366; color: white; }
+    .btn-primary:hover { background: #164a4d; }
+    .btn-success { background: #198754; color: white; }
+    .btn-warning { background: #ffc107; color: #000; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-secondary { background: #6c757d; color: white; }
+    .btn-location { background: #198754; color: white; width: 100%; }
 
-
-    .photo-info {
-
-      background: #f7f7f7;
-
-      padding: 10px;
-
-      border-radius: 8px;
-
-      margin-top: 8px;
-
-      font-size: 13px;
-
-      color: #555;
-
+    /* TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
     }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #1F6366;
+      color: white;
+      position: sticky;
+      top: 0;
+    }
+    tr:hover { background: #f8f9fa; }
+    .table-responsive { overflow-x: auto; }
 
+    /* STATUS BADGES */
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .badge-belum { background: #fff3cd; color: #856404; }
+    .badge-valid { background: #d1e7dd; color: #0f5132; }
+    .badge-tidak-valid { background: #f8d7da; color: #842029; }
+    .badge-proses { background: #cfe2ff; color: #084298; }
+    .badge-selesai { background: #d1e7dd; color: #0f5132; }
+    .badge-ditolak { background: #f8d7da; color: #842029; }
 
-    .success {
-
-      display: none;
-
-      background: #d1e7dd;
-
-      color: #0f5132;
-
+    /* ALERT */
+    .alert {
       padding: 15px;
-
       border-radius: 8px;
+      margin: 15px 0;
+      display: none;
+    }
+    .alert-success { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+    .alert-error { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+    .alert-info { background: #cfe2ff; color: #084298; border: 1px solid #b6d4fe; }
 
-      margin-bottom: 15px;
-
-      line-height: 1.5;
-
+    /* LOGIN */
+    .login-box {
+      max-width: 400px;
+      margin: 50px auto;
     }
 
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      overflow-y: auto;
+    }
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .close {
+      float: right;
+      font-size: 28px;
+      cursor: pointer;
+      color: #999;
+    }
+    .close:hover { color: #333; }
 
-    .error {
+    /* FILTER */
+    .filter-box {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .filter-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .filter-col { flex: 1; min-width: 200px; }
 
-      color: #b02a37;
+    /* RESULT TRACKING */
+    .tracking-result {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+    .info-row {
+      padding: 12px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-weight: bold; color: #555; margin-bottom: 5px; }
 
-      margin-top: 10px;
-
-      font-size: 14px;
-
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .navbar { flex-direction: column; gap: 10px; }
+      .nav-menu { justify-content: center; }
+      .filter-row { flex-direction: column; }
     }
 
-
-    .required {
-
-      color: red;
-
-    }
-
-
-    .divider {
-
-      border: 0;
-
-      border-top: 1px solid #eee;
-
-      margin: 20px 0;
-
-    }
-
+    /* Mode Edit di Tabel Admin */
+.edit-mode {
+  background: #fff9c4 !important;
+  padding: 5px !important;
+}
+.edit-mode select,
+.edit-mode input {
+  border: 1px solid #1F6366;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.view-mode {
+  padding: 8px !important;
+}
+.btn-save, .btn-cancel {
+  margin: 2px;
+}
   </style>
-
 </head>
-
 
 <body>
 
+<!-- NAVBAR -->
+<nav class="navbar">
+  <h1>📢 Aduan Jalan Rusak</h1>
+  <div class="nav-menu">
+    <button class="nav-btn active" onclick="showSection('form')">📝 Form Aduan</button>
+    <button class="nav-btn" onclick="showSection('tracking')">🔍 Cek Status</button>
+    <button class="nav-btn" onclick="showSection('admin')">⚙️ Admin</button>
+  </div>
+</nav>
 
 <div class="container">
 
+  <!-- ============================================ -->
+  <!-- SECTION 1: FORM ADUAN -->
+  <!-- ============================================ -->
+  <div id="section-form" class="section active">
+    <div class="card">
+      <h2>📝 Form Pengaduan Jalan Rusak</h2>
+      <p style="color: #666; margin-bottom: 20px;">Silakan lengkapi data di bawah ini untuk melaporkan kerusakan jalan.</p>
 
-  <!-- HEADER -->
+      <div id="formAlert" class="alert"></div>
 
-  <div class="header">
+      <form id="formAduan">
+        <label>Nama Pelapor <span style="color:red">*</span></label>
+        <input type="text" id="nama" required placeholder="Nama lengkap Anda">
 
-    <h2>📢 Aduan Jalan Rusak</h2>
+        <label>Kontak/WhatsApp <span style="color:red">*</span></label>
+        <input type="tel" id="hp" required placeholder="08xxxxxxxxxx">
 
-    <div>
+        <label>Ruas/Lokasi Jalan <span style="color:red">*</span></label>
+        <input type="text" id="ruas" required placeholder="Contoh: Jl. Cibiru – Cinunuk">
 
-      Silakan sampaikan laporan kerusakan jalan
+        <label>Kecamatan</label>
+        <input type="text" id="kecamatan" placeholder="Contoh: Cileunyi">
 
-      kepada kami. Lengkapi data dan lokasi kerusakan.
+        <label>Desa/Kelurahan</label>
+        <input type="text" id="desa" placeholder="Contoh: Cinunuk">
 
+        <label>Deskripsi Kerusakan <span style="color:red">*</span></label>
+        <textarea id="uraian" required placeholder="Jelaskan kondisi kerusakan (berlubang, retak, amblas, dll)"></textarea>
+
+        <label>Lokasi GPS <span style="color:red">*</span></label>
+        <button type="button" class="btn-location" onclick="ambilLokasi()">📍 Ambil Lokasi Saya</button>
+        <div id="lokasiInfo" style="margin-top: 10px; padding: 10px; background: #eef7f7; border-radius: 8px; font-size: 14px;">
+          Lokasi belum diambil.
+        </div>
+        <input type="hidden" id="latitude">
+        <input type="hidden" id="longitude">
+
+        <label>Foto Kerusakan <span style="color:red">*</span></label>
+        <input type="file" id="foto" accept="image/*" capture="environment" required>
+        <div style="font-size: 13px; color: #666; margin-top: 5px;">📷 Maksimal 5 MB</div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px; padding: 15px;">
+          📤 KIRIM ADUAN
+        </button>
+      </form>
     </div>
-
   </div>
 
+  <!-- ============================================ -->
+  <!-- SECTION 2: TRACKING STATUS -->
+  <!-- ============================================ -->
+  <div id="section-tracking" class="section">
+    <div class="card">
+      <h2>🔍 Cek Status Aduan Anda</h2>
+      <p style="color: #666; margin-bottom: 20px;">Masukkan nomor WhatsApp yang Anda gunakan saat melapor.</p>
 
+      <div id="trackingAlert" class="alert"></div>
 
-  <div class="card">
+      <label>Nomor WhatsApp <span style="color:red">*</span></label>
+      <input type="tel" id="cariHp" placeholder="08xxxxxxxxxx">
+      <button class="btn-primary" onclick="cariAduan()" id="btnCari" style="width: 100%;">
+        🔍 CARI ADUAN
+      </button>
 
-
-    <!-- SUCCESS -->
-
-    <div id="success"
-         class="success">
-
-      <strong>✅ Aduan berhasil dikirim.</strong>
-
-      <br><br>
-
-      Nomor Aduan:
-
-      <strong id="nomorAduan"></strong>
-
-      <br><br>
-
-      <a id="linkMaps"
-         href="#"
-         target="_blank">
-
-        📍 Lihat Lokasi di Google Maps
-
-      </a>
-
+      <div id="trackingResult"></div>
     </div>
-
-
-
-    <!-- FORM -->
-
-    <form id="formAduan">
-
-
-      <!-- NAMA -->
-
-      <label>
-
-        Nama Pelapor
-
-        <span class="required">*</span>
-
-      </label>
-
-      <input
-
-        type="text"
-
-        id="nama"
-
-        required
-
-        placeholder="Nama Anda">
-
-
-
-      <!-- KONTAK -->
-
-      <label>
-
-        Kontak/WA
-
-        <span class="required">*</span>
-
-      </label>
-
-      <input
-
-        type="tel"
-
-        id="hp"
-
-        required
-
-        placeholder="08xxxxxxxxxx">
-
-
-
-           <!-- RUAS JALAN -->
-
-      <label>
-
-        Ruas/Lokasi Jalan
-
-        <span class="required">*</span>
-
-      </label>
-
-      <input
-
-        type="text"
-
-        id="ruas"
-
-        required
-
-        placeholder="Contoh: Jl. Cibiru – Cinunuk">
-
-
-
-      <!-- KECAMATAN (BARU) -->
-
-      <label>
-
-        Kecamatan
-
-      </label>
-
-      <input
-
-        type="text"
-
-        id="kecamatan"
-
-        placeholder="Contoh: Cileunyi">
-
-
-
-      <!-- DESA/KELURAHAN (BARU) -->
-
-      <label>
-
-        Desa/Kelurahan
-
-      </label>
-
-      <input
-
-        type="text"
-
-        id="desa"
-
-        placeholder="Contoh: Cinunuk">
-
-
-
-      <!-- DESKRIPSI -->
-
-      <label>
-
-        Deskripsi Pengaduan
-
-        <span class="required">*</span>
-
-      </label>
-
-      <textarea
-
-        id="uraian"
-
-        required
-
-        placeholder="Jelaskan kondisi kerusakan jalan, misalnya jalan berlubang, retak, amblas, aspal terkelupas, dan lain-lain."></textarea>
-
-
-      <!-- LOKASI -->
-
-      <label>
-
-        Lokasi Kerusakan
-
-        <span class="required">*</span>
-
-      </label>
-
-
-      <button
-
-        type="button"
-
-        class="location"
-
-        onclick="ambilLokasi()">
-
-        📍 AMBIL LOKASI SAYA
-
-      </button>
-
-
-      <div
-
-        id="lokasiInfo"
-
-        class="location-info">
-
-        Lokasi belum diambil.
-
-      </div>
-
-
-      <input
-
-        type="hidden"
-
-        id="latitude">
-
-
-      <input
-
-        type="hidden"
-
-        id="longitude">
-
-
-
-      <!-- FOTO -->
-
-      <label>
-
-        Foto Kerusakan
-
-        <span class="required">*</span>
-
-      </label>
-
-
-      <input
-
-        type="file"
-
-        id="foto"
-
-        accept="image/*"
-
-        capture="environment"
-
-        required>
-
-
-      <div class="photo-info">
-
-        📷 Silakan ambil foto kondisi kerusakan jalan.
-
-        Maksimal ukuran foto 5 MB.
-
-      </div>
-
-
-
-      <!-- ERROR -->
-
-      <div
-
-        id="error"
-
-        class="error">
-
-      </div>
-
-
-
-      <hr class="divider">
-
-
-
-      <!-- SUBMIT -->
-
-      <button
-
-        type="submit"
-
-        class="submit">
-
-        📤 KIRIM ADUAN
-
-      </button>
-
-
-    </form>
-
-
   </div>
 
-</div>
+  <!-- ============================================ -->
+  <!-- SECTION 3: ADMIN DASHBOARD (INLINE CRUD) -->
+  <!-- ============================================ -->
+  <div id="section-admin" class="section">
+    
+    <!-- LOGIN -->
+    <div id="adminLogin" class="card login-box">
+      <h2 style="text-align: center;">🔐 Login Admin</h2>
+      <div id="loginAlert" class="alert"></div>
+      <label>Username</label>
+      <input type="text" id="username" placeholder="Masukkan username">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Masukkan password">
+      <button class="btn-primary" onclick="loginAdmin()" style="width: 100%;">Login</button>
+    </div>
 
+    <!-- DASHBOARD -->
+    <div id="adminDashboard" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+          <h2 style="margin: 0;">📊 Dashboard Admin - Verifikasi Lapangan</h2>
+          <div>
+            <button class="btn-secondary" onclick="logoutAdmin()">Logout</button>
+            <button class="btn-primary" onclick="loadDataAdmin()">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <div class="filter-box">
+          <h3 style="margin-bottom: 10px;">🔍 Filter Data</h3>
+          <div class="filter-row">
+            <div class="filter-col">
+              <label>Status Verifikasi</label>
+              <select id="filterVerif">
+                <option value="">Semua</option>
+                <option value="Belum Diverifikasi">Belum Diverifikasi</option>
+                <option value="Valid">Valid</option>
+                <option value="Tidak Valid">Tidak Valid</option>
+              </select>
+            </div>
+            <div class="filter-col">
+              <label>Status Penanganan</label>
+              <select id="filterHandle">
+                <option value="">Semua</option>
+                <option value="Belum Ditangani">Belum Ditangani</option>
+                <option value="Proses">Proses</option>
+                <option value="Selesai">Selesai</option>
+                <option value="Ditolak">Ditolak</option>
+              </select>
+            </div>
+            <div class="filter-col" style="display: flex; align-items: flex-end;">
+              <button class="btn-primary" onclick="applyFilter()" style="margin: 0;">Terapkan</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="adminAlert" class="alert"></div>
+
+        <div class="table-responsive">
+          <table id="adminTable">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Tanggal</th>
+                <th>Nama</th>
+                <th>Kontak</th>
+                <th>Lokasi</th>
+                <th>Deskripsi</th>
+                <th>Status Verifikasi</th>
+                <th>Status Penanganan</th>
+                <th>Tanggal Update</th>
+                <th>Keterangan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody">
+              <tr><td colspan="11" style="text-align: center;">Klik "Refresh" untuk memuat data</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 <script>
+// =====================================================
+// KONFIGURASI
+// =====================================================
+const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbzK2uwaeSezjpSMJL5BWpPQR18AfBgtfksHrdHEwdGv9e0gVPO5rsJ6jHb0o-fNz0HRvA/exec';
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'admin123'; // Ganti dengan password Anda
 
+let currentUser = '';
 
 // =====================================================
-// URL GOOGLE APPS SCRIPT API
+// NAVIGASI SECTION
 // =====================================================
-
-const URL_APPS_SCRIPT =
-  'https://script.google.com/macros/s/AKfycbz1GDXRcX6JynPX7RiuNyrGRI-8lPctyh593M2nYn1MbMEYqxwCqRIa0i3KYzJKizHX7g/exec';
+function showSection(section) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   
-
-
-// =====================================================
-// MENGAMBIL GPS
-// =====================================================
-
-function ambilLokasi() {
-
-  const info =
-    document.getElementById('lokasiInfo');
-
-  const error =
-    document.getElementById('error');
-
-
-  error.innerHTML = '';
-
-
-  info.innerHTML =
-    '⏳ Sedang mengambil lokasi...';
-
-
-  if (!navigator.geolocation) {
-
-    error.innerHTML =
-      'Perangkat Anda tidak mendukung GPS.';
-
-    return;
-
+  document.getElementById('section-' + section).classList.add('active');
+  event.target.classList.add('active');
+  
+  if (section === 'admin' && localStorage.getItem('adminLogged')) {
+    showAdminDashboard();
+    loadDataAdmin();
   }
-
-
-  navigator.geolocation.getCurrentPosition(
-
-    function(position) {
-
-      const lat =
-        position.coords.latitude;
-
-      const lng =
-        position.coords.longitude;
-
-
-      document.getElementById('latitude')
-        .value = lat;
-
-
-      document.getElementById('longitude')
-        .value = lng;
-
-
-      info.innerHTML =
-
-        '✅ Lokasi berhasil diambil' +
-
-        '<br><br>' +
-
-        '<strong>Latitude:</strong> ' +
-
-        lat +
-
-        '<br>' +
-
-        '<strong>Longitude:</strong> ' +
-
-        lng +
-
-        '<br><br>' +
-
-        '<a href="https://www.google.com/maps?q=' +
-
-        lat + ',' + lng +
-
-        '" target="_blank">' +
-
-        '📍 Cek lokasi di Google Maps' +
-
-        '</a>';
-
-    },
-
-
-    function(errorGPS) {
-
-      let pesan =
-        'Lokasi tidak dapat diambil. ';
-
-
-      if (errorGPS.code === 1) {
-
-        pesan +=
-          'Silakan izinkan akses lokasi pada browser.';
-
-      }
-
-      else if (errorGPS.code === 2) {
-
-        pesan +=
-          'GPS tidak tersedia.';
-
-      }
-
-      else if (errorGPS.code === 3) {
-
-        pesan +=
-          'Pengambilan lokasi terlalu lama.';
-
-      }
-
-
-      error.innerHTML =
-        pesan;
-
-
-      info.innerHTML =
-        '❌ Lokasi belum tersedia.';
-
-    },
-
-
-    {
-
-      enableHighAccuracy: true,
-
-      timeout: 15000,
-
-      maximumAge: 0
-
-    }
-
-  );
-
 }
 
+// =====================================================
+// UTILITAS
+// =====================================================
+function showAlert(elementId, message, type) {
+  const alert = document.getElementById(elementId);
+  alert.className = 'alert alert-' + type;
+  alert.innerHTML = message;
+  alert.style.display = 'block';
+  setTimeout(() => { alert.style.display = 'none'; }, 5000);
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '-';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function getStatusBadge(status, type) {
+  let className = 'badge-belum';
+  if (type === 'verif') {
+    if (status === 'Valid') className = 'badge-valid';
+    else if (status === 'Tidak Valid') className = 'badge-tidak-valid';
+  } else {
+    if (status === 'Proses') className = 'badge-proses';
+    else if (status === 'Selesai') className = 'badge-selesai';
+    else if (status === 'Ditolak') className = 'badge-ditolak';
+  }
+  return '<span class="badge ' + className + '">' + status + '</span>';
+}
 
 // =====================================================
-// MEMBACA FOTO
+// SECTION 1: FORM ADUAN
 // =====================================================
+function ambilLokasi() {
+  const info = document.getElementById('lokasiInfo');
+  info.innerHTML = '⏳ Sedang mengambil lokasi...';
+  
+  if (!navigator.geolocation) {
+    info.innerHTML = ' Perangkat tidak mendukung GPS.';
+    return;
+  }
+  
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      document.getElementById('latitude').value = lat;
+      document.getElementById('longitude').value = lng;
+      info.innerHTML = '✅ Lokasi berhasil diambil<br><strong>Lat:</strong> ' + lat + '<br><strong>Lng:</strong> ' + lng;
+    },
+    function(error) {
+      info.innerHTML = '❌ Gagal mengambil lokasi. Izinkan akses GPS.';
+    },
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+}
 
 function bacaFoto(file) {
-
   return new Promise(function(resolve, reject) {
-
-    const reader =
-      new FileReader();
-
-
+    const reader = new FileReader();
     reader.onload = function(e) {
-
-      const base64 =
-        e.target.result.split(',')[1];
-
-
       resolve({
-
         fileName: file.name,
-
         mimeType: file.type,
-
-        data: base64
-
+        data: e.target.result.split(',')[1]
       });
-
     };
-
-
-    reader.onerror = function() {
-
-      reject(
-        new Error('Foto tidak dapat dibaca.')
-      );
-
-    };
-
-
+    reader.onerror = function() { reject(new Error('Foto tidak dapat dibaca.')); };
     reader.readAsDataURL(file);
-
   });
-
 }
 
+document.getElementById('formAduan').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const lat = document.getElementById('latitude').value;
+  const lng = document.getElementById('longitude').value;
+  
+  if (!lat || !lng) {
+    showAlert('formAlert', '⚠️ Silakan ambil lokasi terlebih dahulu.', 'error');
+    return;
+  }
+  
+  const fotoInput = document.getElementById('foto');
+  if (!fotoInput.files.length) {
+    showAlert('formAlert', '⚠️ Silakan pilih foto.', 'error');
+    return;
+  }
+  
+  const file = fotoInput.files[0];
+  if (file.size > 5 * 1024 * 1024) {
+    showAlert('formAlert', '️ Ukuran foto maksimal 5 MB.', 'error');
+    return;
+  }
+  
+  let foto;
+  try {
+    foto = await bacaFoto(file);
+  } catch (err) {
+    showAlert('formAlert', '❌ ' + err.message, 'error');
+    return;
+  }
+  
+  const data = {
+    nama: document.getElementById('nama').value,
+    hp: document.getElementById('hp').value,
+    ruas: document.getElementById('ruas').value,
+    kecamatan: document.getElementById('kecamatan').value,
+    desa: document.getElementById('desa').value,
+    uraian: document.getElementById('uraian').value,
+    latitude: lat,
+    longitude: lng,
+    foto: foto
+  };
+  
+  const tombol = e.target.querySelector('button[type="submit"]');
+  tombol.disabled = true;
+  tombol.innerHTML = ' Mengirim...';
+  
+  try {
+    const response = await fetch(URL_APPS_SCRIPT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(data)
+    });
+    
+    const result = await response.json();
+    
+    if (!result.berhasil) throw new Error(result.pesan);
+    
+    showAlert('formAlert', '✅ Aduan berhasil dikirim! Nomor: ' + result.nomor, 'success');
+    e.target.reset();
+    document.getElementById('latitude').value = '';
+    document.getElementById('longitude').value = '';
+    document.getElementById('lokasiInfo').innerHTML = 'Lokasi belum diambil.';
+    
+  } catch (err) {
+    showAlert('formAlert', '❌ Gagal: ' + err.message, 'error');
+  } finally {
+    tombol.disabled = false;
+    tombol.innerHTML = '📤 KIRIM ADUAN';
+  }
+});
 
 // =====================================================
-// SUBMIT FORM
+// SECTION 2: TRACKING
+// =====================================================
+function cariAduan() {
+  const hp = document.getElementById('cariHp').value.trim();
+  const resultDiv = document.getElementById('trackingResult');
+  const btn = document.getElementById('btnCari');
+  
+  if (!hp) {
+    showAlert('trackingAlert', '⚠️ Masukkan nomor WhatsApp.', 'error');
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Mencari...';
+  resultDiv.innerHTML = '';
+  
+  fetch(URL_APPS_SCRIPT + '?action=getAduanByHp&hp=' + encodeURIComponent(hp))
+    .then(res => res.json())
+    .then(data => {
+      btn.disabled = false;
+      btn.innerHTML = '🔍 CARI ADUAN';
+      
+      if (!data.berhasil) {
+        showAlert('trackingAlert', '❌ ' + data.pesan, 'error');
+        return;
+      }
+      
+      if (!data.data || data.data.length === 0) {
+        showAlert('trackingAlert', '️ Tidak ada aduan dengan nomor tersebut.', 'error');
+        return;
+      }
+      
+      let html = '<div class="tracking-result">';
+      data.data.forEach((aduan, idx) => {
+        html += '<div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">';
+        html += '<h3 style="color: #1F6366; margin-bottom: 10px;">Aduan #' + aduan.nomor + '</h3>';
+        html += '<div class="info-row"><div class="info-label">Tanggal:</div><div>' + formatDate(aduan.tanggal) + '</div></div>';
+        html += '<div class="info-row"><div class="info-label">Nama:</div><div>' + aduan.nama + '</div></div>';
+        html += '<div class="info-row"><div class="info-label">Lokasi:</div><div>' + aduan.ruas + '</div></div>';
+        html += '<div class="info-row"><div class="info-label">Deskripsi:</div><div>' + aduan.uraian + '</div></div>';
+        html += '<div class="info-row"><div class="info-label">Status Verifikasi:</div><div>' + getStatusBadge(aduan.statusVerifikasi, 'verif') + '</div></div>';
+        html += '<div class="info-row"><div class="info-label">Status Penanganan:</div><div>' + getStatusBadge(aduan.statusPenanganan, 'handle') + '</div></div>';
+        if (aduan.tanggalValidasi) html += '<div class="info-row"><div class="info-label">Tanggal Validasi:</div><div>' + formatDate(aduan.tanggalValidasi) + '</div></div>';
+        if (aduan.divalidasiOleh) html += '<div class="info-row"><div class="info-label">Divalidasi Oleh:</div><div>' + aduan.divalidasiOleh + '</div></div>';
+        if (aduan.keterangan) html += '<div class="info-row"><div class="info-label">Keterangan:</div><div style="background: #fff3cd; padding: 10px; border-radius: 5px;">' + aduan.keterangan + '</div></div>';
+        html += '</div>';
+      });
+      html += '</div>';
+      resultDiv.innerHTML = html;
+      
+    })
+    .catch(err => {
+      btn.disabled = false;
+      btn.innerHTML = '🔍 CARI ADUAN';
+      showAlert('trackingAlert', '❌ Error: ' + err.message, 'error');
+    });
+}
+
+// =====================================================
+// SECTION 3: ADMIN DASHBOARD - INLINE CRUD
 // =====================================================
 
-document
+function loginAdmin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  
+  if (username === ADMIN_USER && password === ADMIN_PASS) {
+    currentUser = username;
+    localStorage.setItem('adminLogged', 'true');
+    localStorage.setItem('adminUser', username);
+    showAdminDashboard();
+    loadDataAdmin();
+  } else {
+    showAlert('loginAlert', '⚠️ Username atau password salah.', 'error');
+  }
+}
 
-  .getElementById('formAduan')
+function logoutAdmin() {
+  localStorage.removeItem('adminLogged');
+  localStorage.removeItem('adminUser');
+  currentUser = '';
+  document.getElementById('adminLogin').style.display = 'block';
+  document.getElementById('adminDashboard').style.display = 'none';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+}
 
-  .addEventListener(
+function showAdminDashboard() {
+  document.getElementById('adminLogin').style.display = 'none';
+  document.getElementById('adminDashboard').style.display = 'block';
+}
 
-    'submit',
-
-    async function(e) {
-
-      e.preventDefault();
-
-
-      const error =
-        document.getElementById('error');
-
-
-      error.innerHTML = '';
-
-
-      // -----------------------------------------------
-      // CEK LOKASI
-      // -----------------------------------------------
-
-      const lat =
-        document.getElementById('latitude').value;
-
-
-      const lng =
-        document.getElementById('longitude').value;
-
-
-      if (!lat || !lng) {
-
-        error.innerHTML =
-          '⚠️ Silakan ambil lokasi terlebih dahulu.';
-
+function loadDataAdmin() {
+  const tbody = document.getElementById('adminTableBody');
+  tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">⏳ Memuat data...</td></tr>';
+  
+  fetch(URL_APPS_SCRIPT + '?action=getAllAduan')
+    .then(res => res.json())
+    .then(data => {
+      if (!data.berhasil) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;"> ' + data.pesan + '</td></tr>';
         return;
-
       }
-
-
-      // -----------------------------------------------
-      // CEK FOTO
-      // -----------------------------------------------
-
-      const fotoInput =
-        document.getElementById('foto');
-
-
-      if (!fotoInput.files.length) {
-
-        error.innerHTML =
-          '⚠️ Silakan pilih atau ambil foto kerusakan.';
-
-        return;
-
-      }
-
-
-      const file =
-        fotoInput.files[0];
-
-
-      // -----------------------------------------------
-      // CEK UKURAN FOTO
-      // -----------------------------------------------
-
-      if (file.size > 5 * 1024 * 1024) {
-
-        error.innerHTML =
-          '⚠️ Ukuran foto maksimal 5 MB.';
-
-        return;
-
-      }
-
-
-      // -----------------------------------------------
-      // BACA FOTO
-      // -----------------------------------------------
-
-      let foto;
-
-
-      try {
-
-        foto =
-          await bacaFoto(file);
-
-      }
-
-      catch (err) {
-
-        error.innerHTML =
-          '❌ ' + err.message;
-
-        return;
-
-      }
-
-
-         // -----------------------------------------------
-      // DATA FORM
-      // -----------------------------------------------
-
-      const data = {
-
-        nama:
-          document.getElementById('nama').value,
-
-        hp:
-          document.getElementById('hp').value,
-
-        ruas:
-          document.getElementById('ruas').value,
-
-        kecamatan:
-          document.getElementById('kecamatan').value,
-
-        desa:
-          document.getElementById('desa').value,
-
-        uraian:
-          document.getElementById('uraian').value,
-
-        latitude:
-          lat,
-
-        longitude:
-          lng,
-
-        foto:
-          foto
-
-      };
-
-
-      // -----------------------------------------------
-      // TOMBOL
-      // -----------------------------------------------
-
-      const tombol =
-        document.querySelector('.submit');
-
-
-      tombol.disabled = true;
-
-
-      tombol.innerHTML =
-        '⏳ Mengirim aduan...';
-
-
-      // -----------------------------------------------
-      // KIRIM KE GOOGLE APPS SCRIPT
-      // -----------------------------------------------
-
-      try {
-
-        const response =
-
-          await fetch(
-
-            URL_APPS_SCRIPT,
-
-            {
-
-              method: 'POST',
-
-              body: JSON.stringify(data)
-
-            }
-
-          );
-
-
-        // ---------------------------------------------
-        // BACA RESPONSE
-        // ---------------------------------------------
-
-        const result =
-          await response.json();
-
-
-        // ---------------------------------------------
-        // JIKA GAGAL
-        // ---------------------------------------------
-
-        if (!result.berhasil) {
-
-          throw new Error(
-            result.pesan ||
-            'Data gagal disimpan.'
-          );
-
-        }
-
-
-        // ---------------------------------------------
-        // RESET FORM
-        // ---------------------------------------------
-
-        document
-
-          .getElementById('formAduan')
-
-          .reset();
-
-
-        document
-
-          .getElementById('latitude')
-
-          .value = '';
-
-
-        document
-
-          .getElementById('longitude')
-
-          .value = '';
-
-
-        document
-
-          .getElementById('lokasiInfo')
-
-          .innerHTML =
-            'Lokasi belum diambil.';
-
-
-        // ---------------------------------------------
-        // TAMPILKAN SUKSES
-        // ---------------------------------------------
-
-        document
-
-          .getElementById('success')
-
-          .style.display = 'block';
-
-
-        document
-
-          .getElementById('nomorAduan')
-
-          .innerHTML =
-            result.nomor;
-
-
-        document
-
-          .getElementById('linkMaps')
-
-          .href =
-            result.maps;
-
-
-        // ---------------------------------------------
-        // KEMBALIKAN TOMBOL
-        // ---------------------------------------------
-
-        tombol.disabled = false;
-
-
-        tombol.innerHTML =
-          '📤 KIRIM ADUAN';
-
-
-        // ---------------------------------------------
-        // SCROLL KE ATAS
-        // ---------------------------------------------
-
-        window.scrollTo({
-
-          top: 0,
-
-          behavior: 'smooth'
-
-        });
-
-
-      }
-
-
-      catch (err) {
-
-        // ---------------------------------------------
-        // ERROR
-        // ---------------------------------------------
-
-        document
-
-          .getElementById('error')
-
-          .innerHTML =
-
-            '❌ Gagal mengirim aduan: ' +
-
-            err.message;
-
-
-        tombol.disabled = false;
-
-
-        tombol.innerHTML =
-          '📤 KIRIM ADUAN';
-
-      }
-
+      renderAdminTable(data.data);
+    })
+    .catch(err => {
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;">❌ Error: ' + err.message + '</td></tr>';
+    });
+}
+
+function renderAdminTable(data) {
+  const tbody = document.getElementById('adminTableBody');
+  tbody.innerHTML = '';
+  
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data</td></tr>';
+    return;
+  }
+  
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.id = 'row-' + row.rowIndex;
+    tr.dataset.rowIndex = row.rowIndex;
+    
+    tr.innerHTML = `
+      <td>${row.nomor}</td>
+      <td>${formatDate(row.tanggal)}</td>
+      <td>${row.nama}</td>
+      <td>${row.hp}</td>
+      <td>${row.ruas}</td>
+      <td title="${row.uraian}">${row.uraian ? row.uraian.substring(0, 50) + (row.uraian.length > 50 ? '...' : '') : '-'}</td>
+      <td class="view-mode">${getStatusBadge(row.statusVerifikasi, 'verif')}</td>
+      <td class="view-mode">${getStatusBadge(row.statusPenanganan, 'handle')}</td>
+      <td class="view-mode">${formatDate(row.tanggalValidasi)}</td>
+      <td class="view-mode">${row.keterangan || '-'}</td>
+      <td>
+        <button class="btn-warning btn-edit" onclick="enableEdit(${row.rowIndex})" style="padding: 6px 10px; font-size: 12px;">✏️ Edit</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Aktifkan mode edit untuk satu baris
+function enableEdit(rowIndex) {
+  const tr = document.getElementById('row-' + rowIndex);
+  if (!tr) return;
+  
+  // Ambil data saat ini dari cell
+  const cells = tr.querySelectorAll('td');
+  const currentVerif = cells[6].innerText.trim();
+  const currentHandle = cells[7].innerText.trim();
+  const currentTanggal = cells[8].innerText.trim();
+  const currentKeterangan = cells[9].innerText.trim();
+  
+  // Ubah cell menjadi input
+  cells[6].className = 'edit-mode';
+  cells[6].innerHTML = `
+    <select class="edit-verif" style="width: 100%; padding: 6px;">
+      <option value="Belum Diverifikasi" ${currentVerif === 'Belum Diverifikasi' ? 'selected' : ''}>Belum Diverifikasi</option>
+      <option value="Valid" ${currentVerif === 'Valid' ? 'selected' : ''}>Valid</option>
+      <option value="Tidak Valid" ${currentVerif === 'Tidak Valid' ? 'selected' : ''}>Tidak Valid</option>
+    </select>
+  `;
+  
+  cells[7].className = 'edit-mode';
+  cells[7].innerHTML = `
+    <select class="edit-handle" style="width: 100%; padding: 6px;">
+      <option value="Belum Ditangani" ${currentHandle === 'Belum Ditangani' ? 'selected' : ''}>Belum Ditangani</option>
+      <option value="Proses" ${currentHandle === 'Proses' ? 'selected' : ''}>Proses</option>
+      <option value="Selesai" ${currentHandle === 'Selesai' ? 'selected' : ''}>Selesai</option>
+      <option value="Ditolak" ${currentHandle === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
+    </select>
+  `;
+  
+  cells[8].className = 'edit-mode';
+  cells[8].innerHTML = `<input type="date" class="edit-tanggal" style="width: 100%; padding: 6px;">`;
+  
+  cells[9].className = 'edit-mode';
+  cells[9].innerHTML = `<input type="text" class="edit-keterangan" placeholder="Masukkan keterangan" style="width: 100%; padding: 6px;" value="${currentKeterangan === '-' ? '' : currentKeterangan}">`;
+  
+  cells[10].innerHTML = `
+    <button class="btn-success btn-save" onclick="saveRow(${rowIndex})" style="padding: 6px 10px; font-size: 12px;">💾 Simpan</button>
+    <button class="btn-secondary btn-cancel" onclick="loadDataAdmin()" style="padding: 6px 10px; font-size: 12px;"> Batal</button>
+  `;
+}
+
+// Simpan perubahan satu baris
+// Simpan perubahan satu baris
+function saveRow(rowIndex) {
+  const tr = document.getElementById('row-' + rowIndex);
+  if (!tr) return;
+  
+  const btn = tr.querySelector('.btn-save');
+  btn.disabled = true;
+  btn.innerHTML = '⏳...';
+  
+  const data = {
+    action: 'updateAduan',
+    rowIndex: rowIndex,
+    statusVerifikasi: tr.querySelector('.edit-verif').value,
+    statusPenanganan: tr.querySelector('.edit-handle').value,
+    tanggalValidasi: tr.querySelector('.edit-tanggal').value,
+    divalidasiOleh: currentUser || 'Admin',  // Tambahkan ini
+    keterangan: tr.querySelector('.edit-keterangan').value,
+    updatedBy: currentUser
+  };
+  
+  fetch(URL_APPS_SCRIPT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(result => {
+    if (!result.berhasil) {
+      showAlert('adminAlert', '❌ Gagal: ' + result.pesan, 'error');
+      btn.disabled = false;
+      btn.innerHTML = '💾 Simpan';
+      return;
     }
+    showAlert('adminAlert', '✅ Data berhasil diupdate!', 'success');
+    loadDataAdmin();
+  })
+  .catch(err => {
+    showAlert('adminAlert', '❌ Error: ' + err.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '💾 Simpan';
+  });
+}
 
-  );
+function applyFilter() {
+  const filterVerif = document.getElementById('filterVerif').value;
+  const filterHandle = document.getElementById('filterHandle').value;
+  
+  const tbody = document.getElementById('adminTableBody');
+  tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;"> Memfilter...</td></tr>';
+  
+  fetch(URL_APPS_SCRIPT + '?action=getAllAduan&filterVerif=' + encodeURIComponent(filterVerif) + '&filterHandle=' + encodeURIComponent(filterHandle))
+    .then(res => res.json())
+    .then(data => {
+      if (data.berhasil) renderAdminTable(data.data);
+    });
+}
 
+// Auto-login jika sudah login sebelumnya
+if (localStorage.getItem('adminLogged')) {
+  currentUser = localStorage.getItem('adminUser') || 'admin';
+  showAdminDashboard();
+}
 </script>
 
-
 </body>
-
 </html>
