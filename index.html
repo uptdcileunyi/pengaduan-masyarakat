@@ -667,6 +667,13 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
     
     showAlert('formAlert', '✅ Aduan berhasil dikirim! Silakan cek status Anda.', 'success');
     e.target.reset();
+        // Hapus draft setelah berhasil kirim
+    localStorage.removeItem('draft_nama');
+    localStorage.removeItem('draft_hp');
+    localStorage.removeItem('draft_ruas');
+    localStorage.removeItem('draft_kecamatan');
+    localStorage.removeItem('draft_desa');
+    localStorage.removeItem('draft_uraian');
     document.getElementById('latitude').value = '';
     document.getElementById('longitude').value = '';
     document.getElementById('lokasiInfo').innerHTML = 'Lokasi belum diambil.';
@@ -797,16 +804,23 @@ function loadDataAdmin() {
   const tbody = document.getElementById('adminTableBody');
   tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">⏳ Memuat data...</td></tr>';
   
-  fetch(URL_APPS_SCRIPT + '?action=getAllAduan')
-    .then(res => res.json())
+  fetch(URL_APPS_SCRIPT + '?action=getAllAduan', {
+    method: 'GET',
+    mode: 'cors'  // <-- INI PENTING!
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('HTTP error! status: ' + res.status);
+      return res.json();
+    })
     .then(data => {
       if (!data.berhasil) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;"> ' + data.pesan + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;">⚠️ ' + data.pesan + '</td></tr>';
         return;
       }
       renderAdminTable(data.data);
     })
     .catch(err => {
+      console.error('Error:', err);
       tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;">❌ Error: ' + err.message + '</td></tr>';
     });
 }
@@ -937,12 +951,22 @@ function applyFilter() {
   const filterHandle = document.getElementById('filterHandle').value;
   
   const tbody = document.getElementById('adminTableBody');
-  tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;"> Memfilter...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">⏳ Memfilter...</td></tr>';
   
-  fetch(URL_APPS_SCRIPT + '?action=getAllAduan&filterVerif=' + encodeURIComponent(filterVerif) + '&filterHandle=' + encodeURIComponent(filterHandle))
-    .then(res => res.json())
+  fetch(URL_APPS_SCRIPT + '?action=getAllAduan&filterVerif=' + encodeURIComponent(filterVerif) + '&filterHandle=' + encodeURIComponent(filterHandle), {
+    method: 'GET',
+    mode: 'cors'  // <-- Tambahkan ini
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('HTTP error! status: ' + res.status);
+      return res.json();
+    })
     .then(data => {
       if (data.berhasil) renderAdminTable(data.data);
+    })
+    .catch(err => {
+      console.error('Filter error:', err);
+      tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;">❌ Error: ' + err.message + '</td></tr>';
     });
 }
 
