@@ -506,7 +506,7 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   const lng = document.getElementById('longitude').value;
   
   if (!lat || !lng) {
-    showAlert('formAlert', '⚠️ Silakan ambil lokasi terlebih dahulu.', 'error');
+    showAlert('formAlert', '️ Silakan ambil lokasi terlebih dahulu.', 'error');
     return;
   }
   
@@ -518,7 +518,7 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   
   const file = fotoInput.files[0];
   if (file.size > 5 * 1024 * 1024) {
-    showAlert('formAlert', '️ Ukuran foto maksimal 5 MB.', 'error');
+    showAlert('formAlert', '⚠️ Ukuran foto maksimal 5 MB.', 'error');
     return;
   }
   
@@ -544,25 +544,17 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   
   const tombol = e.target.querySelector('button[type="submit"]');
   tombol.disabled = true;
-  tombol.innerHTML = ' Mengirim...';
+  tombol.innerHTML = '⏳ Mengirim...';
   
   try {
     const response = await fetch(URL_APPS_SCRIPT, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(data)
     });
     
-    if (!response.ok) {
-      throw new Error('Gagal terhubung ke server. Status: ' + response.status);
-    }
-    
-    const result = await response.json();
-    
-    if (!result.berhasil) throw new Error(result.pesan);
-    
-    showAlert('formAlert', '✅ Aduan berhasil dikirim! Nomor: ' + result.nomor, 'success');
-  
+    showAlert('formAlert', '✅ Aduan berhasil dikirim! Silakan cek status Anda.', 'success');
     e.target.reset();
     document.getElementById('latitude').value = '';
     document.getElementById('longitude').value = '';
