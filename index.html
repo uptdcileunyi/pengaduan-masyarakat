@@ -553,11 +553,16 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
       body: JSON.stringify(data)
     });
     
+    if (!response.ok) {
+      throw new Error('Gagal terhubung ke server. Status: ' + response.status);
+    }
+    
     const result = await response.json();
     
     if (!result.berhasil) throw new Error(result.pesan);
     
     showAlert('formAlert', '✅ Aduan berhasil dikirim! Nomor: ' + result.nomor, 'success');
+  
     e.target.reset();
     document.getElementById('latitude').value = '';
     document.getElementById('longitude').value = '';
