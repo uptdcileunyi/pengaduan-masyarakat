@@ -406,10 +406,9 @@
 // KONFIGURASI
 // =====================================================
 const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwYiDasd5376rp29oiasR5dlFSgo615v_ki1T6Bp9zvI7V1mrs80_vKrSACSJy8NfhHEQ/exec';
-const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'admin123'; // Ganti dengan password Anda
 
 let currentUser = '';
+let adminToken = ''; 
 
 // =====================================================
 // NAVIGASI SECTION
@@ -506,7 +505,7 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   const lng = document.getElementById('longitude').value;
   
   if (!lat || !lng) {
-    showAlert('formAlert', '️ Silakan ambil lokasi terlebih dahulu.', 'error');
+    showAlert('formAlert', '⚠️ Silakan ambil lokasi terlebih dahulu.', 'error');
     return;
   }
   
@@ -518,7 +517,7 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   
   const file = fotoInput.files[0];
   if (file.size > 5 * 1024 * 1024) {
-    showAlert('formAlert', '⚠️ Ukuran foto maksimal 5 MB.', 'error');
+    showAlert('formAlert', '️ Ukuran foto maksimal 5 MB.', 'error');
     return;
   }
   
@@ -544,17 +543,20 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   
   const tombol = e.target.querySelector('button[type="submit"]');
   tombol.disabled = true;
-  tombol.innerHTML = '⏳ Mengirim...';
+  tombol.innerHTML = ' Mengirim...';
   
   try {
     const response = await fetch(URL_APPS_SCRIPT, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(data)
     });
     
-    showAlert('formAlert', '✅ Aduan berhasil dikirim! Silakan cek status Anda.', 'success');
+    const result = await response.json();
+    
+    if (!result.berhasil) throw new Error(result.pesan);
+    
+    showAlert('formAlert', '✅ Aduan berhasil dikirim! Nomor: ' + result.nomor, 'success');
     e.target.reset();
     document.getElementById('latitude').value = '';
     document.getElementById('longitude').value = '';
@@ -634,16 +636,55 @@ function cariAduan() {
 function loginAdmin() {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value.trim();
+  const btn = document.querySelector('#adminLogin button'); // Pastikan selector ini benar
   
-  if (username === ADMIN_USER && password === ADMIN_PASS) {
-    currentUser = username;
-    localStorage.setItem('adminLogged', 'true');
-    localStorage.setItem('adminUser', username);
-    showAdminDashboard();
-    loadDataAdmin();
-  } else {
-    showAlert('loginAlert', '⚠️ Username atau password salah.', 'error');
+  if (!username || !password) {
+    showAlert('loginAlert', '⚠️ Username dan password harus diisi.', 'error');
+    return;
   }
+  
+  // Ubah tombol jadi loading
+  const originalText = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Memverifikasi...';
+  
+  // Kirim ke backend untuk validasi
+  fetch(URL_APPS_SCRIPT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      action: 'loginAdmin',
+      username: username,
+      password: password
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+    
+    if (data.berhasil) {
+      adminToken = data.token;
+      currentUser = data.username;
+      
+      localStorage.setItem('adminLogged', 'true');
+      localStorage.setItem('adminUser', username);
+      localStorage.setItem('adminToken', data.token);
+      localStorage.setItem('tokenExpiredAt', data.expiredAt);
+      
+      showAdminDashboard();
+      loadDataAdmin();
+      showAlert('loginAlert', '✅ ' + data.pesan, 'success');
+    } else {
+      showAlert('loginAlert', '❌ ' + data.pesan, 'error');
+      document.getElementById('password').value = '';
+    }
+  })
+  .catch(err => {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+    showAlert('loginAlert', ' Error koneksi: ' + err.message, 'error');
+  });
 }
 
 function logoutAdmin() {
