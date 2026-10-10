@@ -5,360 +5,247 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Aduan Jalan Rusak - Sistem Pengaduan Masyarakat</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter for modern look -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f3f6f7;
-      color: #333;
+    /* Custom Config untuk Tailwind agar sesuai tema asli */
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#1F6366',
+            'primary-dark': '#164a4d',
+            secondary: '#f3f6f7',
+          },
+          fontFamily: {
+            sans: ['Inter', 'Segoe UI', 'Arial', 'sans-serif'],
+          }
+        }
+      }
     }
 
-    /* NAVBAR */
-    .navbar {
-      background: #1F6366;
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* Animasi Fade In */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .navbar h1 { font-size: 20px; }
-    .nav-menu { display: flex; gap: 10px; flex-wrap: wrap; }
-    .nav-btn {
-      background: rgba(255,255,255,0.2);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
-      transition: all 0.3s;
-    }
-    .nav-btn:hover, .nav-btn.active {
-      background: white;
-      color: #1F6366;
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
     }
 
-    /* CONTAINER */
-    .container {
-      max-width: 1000px;
-      margin: 30px auto;
-      padding: 0 20px;
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1; 
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1F6366; 
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #164a4d; 
     }
 
-    /* SECTIONS */
-    .section { display: none; }
-    .section.active { display: block; }
-
-    /* CARD */
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
-    }
-    .card h2 {
-      color: #1F6366;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #e0e0e0;
-    }
-
-    /* FORM */
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 6px;
-      font-weight: bold;
-      color: #444;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 15px;
-      font-family: inherit;
-    }
-    textarea { min-height: 100px; resize: vertical; }
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: all 0.3s;
-    }
-    button:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-primary { background: #1F6366; color: white; }
-    .btn-primary:hover { background: #164a4d; }
-    .btn-success { background: #198754; color: white; }
-    .btn-warning { background: #ffc107; color: #000; }
-    .btn-danger { background: #dc3545; color: white; }
-    .btn-secondary { background: #6c757d; color: white; }
-    .btn-location { background: #198754; color: white; width: 100%; }
-
-    /* TABLE */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-    th {
-      background: #1F6366;
-      color: white;
-      position: sticky;
-      top: 0;
-    }
-    tr:hover { background: #f8f9fa; }
-    .table-responsive { overflow-x: auto; }
-
-    /* STATUS BADGES */
-    .badge {
+    /* Loading Spinner */
+    .spinner {
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
       display: inline-block;
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: bold;
+      vertical-align: middle;
+      margin-right: 8px;
     }
-    .badge-belum { background: #fff3cd; color: #856404; }
-    .badge-valid { background: #d1e7dd; color: #0f5132; }
-    .badge-tidak-valid { background: #f8d7da; color: #842029; }
-    .badge-proses { background: #cfe2ff; color: #084298; }
-    .badge-selesai { background: #d1e7dd; color: #0f5132; }
-    .badge-ditolak { background: #f8d7da; color: #842029; }
-
-    /* ALERT */
-    .alert {
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-      display: none;
-    }
-    .alert-success { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
-    .alert-error { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
-    .alert-info { background: #cfe2ff; color: #084298; border: 1px solid #b6d4fe; }
-
-    /* LOGIN */
-    .login-box {
-      max-width: 400px;
-      margin: 50px auto;
-    }
-
-    /* MODAL */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0; top: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      overflow-y: auto;
-    }
-    .modal-content {
-      background: white;
-      margin: 5% auto;
-      padding: 25px;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-    }
-    .close {
-      float: right;
-      font-size: 28px;
-      cursor: pointer;
-      color: #999;
-    }
-    .close:hover { color: #333; }
-
-    /* FILTER */
-    .filter-box {
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .filter-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .filter-col { flex: 1; min-width: 200px; }
-
-    /* RESULT TRACKING */
-    .tracking-result {
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
-    .info-row {
-      padding: 12px 0;
-      border-bottom: 1px solid #e0e0e0;
-    }
-    .info-row:last-child { border-bottom: none; }
-    .info-label { font-weight: bold; color: #555; margin-bottom: 5px; }
-
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      .navbar { flex-direction: column; gap: 10px; }
-      .nav-menu { justify-content: center; }
-      .filter-row { flex-direction: column; }
-    }
-
-    /* Mode Edit di Tabel Admin */
-.edit-mode {
-  background: #fff9c4 !important;
-  padding: 5px !important;
-}
-.edit-mode select,
-.edit-mode input {
-  border: 1px solid #1F6366;
-  border-radius: 4px;
-  font-size: 13px;
-}
-.view-mode {
-  padding: 8px !important;
-}
-.btn-save, .btn-cancel {
-  margin: 2px;
-}
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 
-<body>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
 
 <!-- NAVBAR -->
-<nav class="navbar">
-  <h1>📢 Aduan Jalan Rusak</h1>
-  <div class="nav-menu">
-    <button class="nav-btn active" onclick="showSection('form')">📝 Form Aduan</button>
-    <button class="nav-btn" onclick="showSection('tracking')">🔍 Cek Status</button>
-    <button class="nav-btn" onclick="showSection('admin')">⚙️ Admin</button>
+<nav class="bg-primary text-white shadow-lg sticky top-0 z-50 transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <h1 class="text-xl font-bold tracking-tight flex items-center gap-2">
+        <span class="text-2xl">📢</span> Aduan Jalan Rusak
+      </h1>
+      <div class="hidden md:flex space-x-2">
+        <button id="nav-form" onclick="showSection('form')" class="nav-btn px-4 py-2 rounded-md bg-white/20 hover:bg-white hover:text-primary transition-all duration-200 font-medium text-sm active-nav">📝 Form Aduan</button>
+        <button id="nav-tracking" onclick="showSection('tracking')" class="nav-btn px-4 py-2 rounded-md bg-white/20 hover:bg-white hover:text-primary transition-all duration-200 font-medium text-sm">🔍 Cek Status</button>
+        <button id="nav-admin" onclick="showSection('admin')" class="nav-btn px-4 py-2 rounded-md bg-white/20 hover:bg-white hover:text-primary transition-all duration-200 font-medium text-sm">⚙️ Admin</button>
+      </div>
+      <!-- Mobile Menu Button (Optional visual only, logic remains simple as per original) -->
+      <div class="md:hidden">
+        <button class="text-white focus:outline-none">☰</button>
+      </div>
+    </div>
+    <!-- Mobile Nav (Simple implementation) -->
+    <div class="md:hidden pb-4 flex justify-center gap-2">
+      <button id="nav-form-m" onclick="showSection('form')" class="nav-btn px-3 py-2 rounded-md bg-white/20 text-xs active-nav">Form</button>
+      <button id="nav-tracking-m" onclick="showSection('tracking')" class="nav-btn px-3 py-2 rounded-md bg-white/20 text-xs">Status</button>
+      <button id="nav-admin-m" onclick="showSection('admin')" class="nav-btn px-3 py-2 rounded-md bg-white/20 text-xs">Admin</button>
+    </div>
   </div>
 </nav>
 
-<div class="container">
+<div class="container mx-auto px-4 py-8 max-w-5xl flex-grow">
 
   <!-- ============================================ -->
   <!-- SECTION 1: FORM ADUAN -->
   <!-- ============================================ -->
-  <div id="section-form" class="section active">
-    <div class="card">
-      <h2>📝 Form Pengaduan Jalan Rusak</h2>
-      <p style="color: #666; margin-bottom: 20px;">Silakan lengkapi data di bawah ini untuk melaporkan kerusakan jalan.</p>
+  <div id="section-form" class="section fade-in block">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="p-6 sm:p-8">
+        <h2 class="text-2xl font-bold text-primary mb-2">📝 Form Pengaduan Jalan Rusak</h2>
+        <p class="text-gray-500 mb-6 text-sm">Silakan lengkapi data di bawah ini untuk melaporkan kerusakan jalan.</p>
 
-      <div id="formAlert" class="alert"></div>
+        <div id="formAlert" class="alert hidden mb-4 p-4 rounded-lg border text-sm font-medium"></div>
 
-      <form id="formAduan">
-        <label>Nama Pelapor <span style="color:red">*</span></label>
-        <input type="text" id="nama" required placeholder="Nama lengkap Anda">
+        <form id="formAduan" class="space-y-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Pelapor <span class="text-red-500">*</span></label>
+              <input type="text" id="nama" required placeholder="Nama lengkap Anda" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Kontak/WhatsApp <span class="text-red-500">*</span></label>
+              <input type="tel" id="hp" required placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+            </div>
+          </div>
 
-        <label>Kontak/WhatsApp <span style="color:red">*</span></label>
-        <input type="tel" id="hp" required placeholder="08xxxxxxxxxx">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Ruas/Lokasi Jalan <span class="text-red-500">*</span></label>
+            <input type="text" id="ruas" required placeholder="Contoh: Jl. Cibiru – Cinunuk" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+          </div>
 
-        <label>Ruas/Lokasi Jalan <span style="color:red">*</span></label>
-        <input type="text" id="ruas" required placeholder="Contoh: Jl. Cibiru – Cinunuk">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Kecamatan</label>
+              <input type="text" id="kecamatan" placeholder="Contoh: Cileunyi" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Desa/Kelurahan</label>
+              <input type="text" id="desa" placeholder="Contoh: Cinunuk" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+            </div>
+          </div>
 
-        <label>Kecamatan</label>
-        <input type="text" id="kecamatan" placeholder="Contoh: Cileunyi">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Deskripsi Kerusakan <span class="text-red-500">*</span></label>
+            <textarea id="uraian" required placeholder="Jelaskan kondisi kerusakan (berlubang, retak, amblas, dll)" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all min-h-[100px] resize-y"></textarea>
+          </div>
 
-        <label>Desa/Kelurahan</label>
-        <input type="text" id="desa" placeholder="Contoh: Cinunuk">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Lokasi GPS <span class="text-red-500">*</span></label>
+            <button type="button" onclick="ambilLokasi()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+              📍 Ambil Lokasi Saya
+            </button>
+            <div id="lokasiInfo" class="mt-2 p-3 bg-blue-50 text-blue-800 rounded-lg text-sm border border-blue-100">
+              Lokasi belum diambil.
+            </div>
+            <input type="hidden" id="latitude">
+            <input type="hidden" id="longitude">
+          </div>
 
-        <label>Deskripsi Kerusakan <span style="color:red">*</span></label>
-        <textarea id="uraian" required placeholder="Jelaskan kondisi kerusakan (berlubang, retak, amblas, dll)"></textarea>
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Foto Kerusakan <span class="text-red-500">*</span></label>
+            <input type="file" id="foto" accept="image/*" capture="environment" required class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark cursor-pointer">
+            <div class="text-xs text-gray-400 mt-1">📷 Maksimal 5 MB</div>
+          </div>
 
-        <label>Lokasi GPS <span style="color:red">*</span></label>
-        <button type="button" class="btn-location" onclick="ambilLokasi()">📍 Ambil Lokasi Saya</button>
-        <div id="lokasiInfo" style="margin-top: 10px; padding: 10px; background: #eef7f7; border-radius: 8px; font-size: 14px;">
-          Lokasi belum diambil.
-        </div>
-        <input type="hidden" id="latitude">
-        <input type="hidden" id="longitude">
-
-        <label>Foto Kerusakan <span style="color:red">*</span></label>
-        <input type="file" id="foto" accept="image/*" capture="environment" required>
-        <div style="font-size: 13px; color: #666; margin-top: 5px;">📷 Maksimal 5 MB</div>
-
-        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px; padding: 15px;">
-          📤 KIRIM ADUAN
-        </button>
-      </form>
+          <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+            📤 KIRIM ADUAN
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 
   <!-- ============================================ -->
   <!-- SECTION 2: TRACKING STATUS -->
   <!-- ============================================ -->
-  <div id="section-tracking" class="section">
-    <div class="card">
-      <h2>🔍 Cek Status Aduan Anda</h2>
-      <p style="color: #666; margin-bottom: 20px;">Masukkan nomor WhatsApp yang Anda gunakan saat melapor.</p>
+  <div id="section-tracking" class="section hidden fade-in">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
+      <h2 class="text-2xl font-bold text-primary mb-2">🔍 Cek Status Aduan Anda</h2>
+      <p class="text-gray-500 mb-6 text-sm">Masukkan nomor WhatsApp yang Anda gunakan saat melapor.</p>
 
-      <div id="trackingAlert" class="alert"></div>
+      <div id="trackingAlert" class="alert hidden mb-4 p-4 rounded-lg border text-sm font-medium"></div>
 
-      <label>Nomor WhatsApp <span style="color:red">*</span></label>
-      <input type="tel" id="cariHp" placeholder="08xxxxxxxxxx">
-      <button class="btn-primary" onclick="cariAduan()" id="btnCari" style="width: 100%;">
-        🔍 CARI ADUAN
-      </button>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Nomor WhatsApp <span class="text-red-500">*</span></label>
+          <input type="tel" id="cariHp" placeholder="08xxxxxxxxxx" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+        </div>
+        <button onclick="cariAduan()" id="btnCari" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
+          🔍 CARI ADUAN
+        </button>
+      </div>
 
-      <div id="trackingResult"></div>
+      <div id="trackingResult" class="mt-6 space-y-4"></div>
     </div>
   </div>
 
   <!-- ============================================ -->
-  <!-- SECTION 3: ADMIN DASHBOARD (INLINE CRUD) -->
+  <!-- SECTION 3: ADMIN DASHBOARD -->
   <!-- ============================================ -->
-  <div id="section-admin" class="section">
+  <div id="section-admin" class="section hidden fade-in">
     
     <!-- LOGIN -->
-    <div id="adminLogin" class="card login-box">
-      <h2 style="text-align: center;">🔐 Login Admin</h2>
-      <div id="loginAlert" class="alert"></div>
-      <label>Username</label>
-      <input type="text" id="username" placeholder="Masukkan username">
-      <label>Password</label>
-      <input type="password" id="password" placeholder="Masukkan password">
-      <button class="btn-primary" onclick="loginAdmin()" style="width: 100%;">Login</button>
+    <div id="adminLogin" class="bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-md mx-auto">
+      <h2 class="text-2xl font-bold text-primary mb-6 text-center">🔐 Login Admin</h2>
+      <div id="loginAlert" class="alert hidden mb-4 p-4 rounded-lg border text-sm font-medium"></div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Username</label>
+          <input type="text" id="username" placeholder="Masukkan username" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+          <input type="password" id="password" placeholder="Masukkan password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+        </div>
+        <button onclick="loginAdmin()" class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg">
+          Login
+        </button>
+      </div>
     </div>
 
     <!-- DASHBOARD -->
-    <div id="adminDashboard" style="display: none;">
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
-          <h2 style="margin: 0;">📊 Dashboard Admin - Verifikasi Lapangan</h2>
-          <div>
-            <button class="btn-secondary" onclick="logoutAdmin()">Logout</button>
-            <button class="btn-primary" onclick="loadDataAdmin()">🔄 Refresh</button>
+    <div id="adminDashboard" style="display: none;" class="space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <h2 class="text-2xl font-bold text-primary">📊 Dashboard Admin</h2>
+          <div class="flex gap-2">
+            <button onclick="logoutAdmin()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Logout</button>
+            <button onclick="loadDataAdmin()" class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">🔄 Refresh</button>
           </div>
         </div>
 
-        <div class="filter-box">
-          <h3 style="margin-bottom: 10px;">🔍 Filter Data</h3>
-          <div class="filter-row">
-            <div class="filter-col">
-              <label>Status Verifikasi</label>
-              <select id="filterVerif">
+        <!-- Filter Section -->
+        <div class="p-6 bg-gray-50 border-b border-gray-100">
+          <h3 class="text-sm font-bold text-gray-600 uppercase tracking-wide mb-3">🔍 Filter Data</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-500 mb-1">Status Verifikasi</label>
+              <select id="filterVerif" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm">
                 <option value="">Semua</option>
                 <option value="Belum Diverifikasi">Belum Diverifikasi</option>
                 <option value="Valid">Valid</option>
                 <option value="Tidak Valid">Tidak Valid</option>
               </select>
             </div>
-            <div class="filter-col">
-              <label>Status Penanganan</label>
-              <select id="filterHandle">
+            <div>
+              <label class="block text-xs font-semibold text-gray-500 mb-1">Status Penanganan</label>
+              <select id="filterHandle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm">
                 <option value="">Semua</option>
                 <option value="Belum Ditangani">Belum Ditangani</option>
                 <option value="Proses">Proses</option>
@@ -366,33 +253,34 @@
                 <option value="Ditolak">Ditolak</option>
               </select>
             </div>
-            <div class="filter-col" style="display: flex; align-items: flex-end;">
-              <button class="btn-primary" onclick="applyFilter()" style="margin: 0;">Terapkan</button>
+            <div class="flex items-end">
+              <button onclick="applyFilter()" class="w-full bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">Terapkan</button>
             </div>
           </div>
         </div>
 
-        <div id="adminAlert" class="alert"></div>
+        <div id="adminAlert" class="alert hidden m-6 p-4 rounded-lg border text-sm font-medium"></div>
 
-        <div class="table-responsive">
-          <table id="adminTable">
-            <thead>
+        <!-- Table Section -->
+        <div class="overflow-x-auto">
+          <table id="adminTable" class="w-full text-left text-sm">
+            <thead class="bg-primary text-white">
               <tr>
-                <th>No</th>
-                <th>Tanggal</th>
-                <th>Nama</th>
-                <th>Kontak</th>
-                <th>Lokasi</th>
-                <th>Deskripsi</th>
-                <th>Status Verifikasi</th>
-                <th>Status Penanganan</th>
-                <th>Tanggal Update</th>
-                <th>Keterangan</th>
-                <th>Aksi</th>
+                <th class="px-4 py-3 font-semibold">No</th>
+                <th class="px-4 py-3 font-semibold">Tanggal</th>
+                <th class="px-4 py-3 font-semibold">Nama</th>
+                <th class="px-4 py-3 font-semibold">Kontak</th>
+                <th class="px-4 py-3 font-semibold">Lokasi</th>
+                <th class="px-4 py-3 font-semibold">Deskripsi</th>
+                <th class="px-4 py-3 font-semibold">Verifikasi</th>
+                <th class="px-4 py-3 font-semibold">Penanganan</th>
+                <th class="px-4 py-3 font-semibold">Update</th>
+                <th class="px-4 py-3 font-semibold">Keterangan</th>
+                <th class="px-4 py-3 font-semibold text-center">Aksi</th>
               </tr>
             </thead>
-            <tbody id="adminTableBody">
-              <tr><td colspan="11" style="text-align: center;">Klik "Refresh" untuk memuat data</td></tr>
+            <tbody id="adminTableBody" class="divide-y divide-gray-100">
+              <tr><td colspan="11" class="px-4 py-8 text-center text-gray-500">Klik "Refresh" untuk memuat data</td></tr>
             </tbody>
           </table>
         </div>
@@ -400,6 +288,7 @@
     </div>
   </div>
 
+</div>
 
 <script>
 // =====================================================
@@ -407,7 +296,7 @@
 // =====================================================
 const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwAq-VE48gK_-1-9wvt48p1ZOERmwEoVOh3pr7YP4-259hb2csWUBqWFsL0nWqLG-qZKw/exec';
 const ADMIN_USER = 'admin';
-const ADMIN_PASS = 'admin123'; // Ganti dengan password Anda
+const ADMIN_PASS = 'admin123'; 
 
 let currentUser = '';
 
@@ -415,12 +304,37 @@ let currentUser = '';
 // NAVIGASI SECTION
 // =====================================================
 function showSection(section) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  // Hide all sections
+  document.querySelectorAll('.section').forEach(s => {
+    s.classList.add('hidden');
+    s.classList.remove('block');
+  });
   
-  document.getElementById('section-' + section).classList.add('active');
-  event.target.classList.add('active');
+  // Show target section with animation
+  const target = document.getElementById('section-' + section);
+  target.classList.remove('hidden');
+  target.classList.add('block', 'fade-in');
   
+  // Update Nav Buttons State (Desktop & Mobile)
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('bg-white', 'text-primary', 'active-nav');
+    btn.classList.add('bg-white/20', 'text-white');
+  });
+  
+  // Find buttons associated with this section
+  const desktopBtn = document.getElementById('nav-' + section);
+  const mobileBtn = document.getElementById('nav-' + section + '-m');
+  
+  if(desktopBtn) {
+    desktopBtn.classList.remove('bg-white/20', 'text-white');
+    desktopBtn.classList.add('bg-white', 'text-primary', 'active-nav');
+  }
+  if(mobileBtn) {
+    mobileBtn.classList.remove('bg-white/20', 'text-white');
+    mobileBtn.classList.add('bg-white', 'text-primary', 'active-nav');
+  }
+  
+  // Auto load admin data if logged in
   if (section === 'admin' && localStorage.getItem('adminLogged')) {
     showAdminDashboard();
     loadDataAdmin();
@@ -432,10 +346,24 @@ function showSection(section) {
 // =====================================================
 function showAlert(elementId, message, type) {
   const alert = document.getElementById(elementId);
-  alert.className = 'alert alert-' + type;
+  if(!alert) return;
+  
+  let classes = 'alert p-4 rounded-lg border text-sm font-medium mb-4 ';
+  if(type === 'success') {
+    classes += 'bg-green-100 border-green-300 text-green-800';
+  } else if(type === 'error') {
+    classes += 'bg-red-100 border-red-300 text-red-800';
+  } else {
+    classes += 'bg-blue-100 border-blue-300 text-blue-800';
+  }
+  
+  alert.className = classes;
   alert.innerHTML = message;
   alert.style.display = 'block';
-  setTimeout(() => { alert.style.display = 'none'; }, 5000);
+  
+  setTimeout(() => { 
+    alert.style.display = 'none'; 
+  }, 5000);
 }
 
 function formatDate(dateStr) {
@@ -445,16 +373,18 @@ function formatDate(dateStr) {
 }
 
 function getStatusBadge(status, type) {
-  let className = 'badge-belum';
+  let className = 'bg-yellow-100 text-yellow-800 border-yellow-200'; // Default Belum
+  
   if (type === 'verif') {
-    if (status === 'Valid') className = 'badge-valid';
-    else if (status === 'Tidak Valid') className = 'badge-tidak-valid';
+    if (status === 'Valid') className = 'bg-green-100 text-green-800 border-green-200';
+    else if (status === 'Tidak Valid') className = 'bg-red-100 text-red-800 border-red-200';
   } else {
-    if (status === 'Proses') className = 'badge-proses';
-    else if (status === 'Selesai') className = 'badge-selesai';
-    else if (status === 'Ditolak') className = 'badge-ditolak';
+    if (status === 'Proses') className = 'bg-blue-100 text-blue-800 border-blue-200';
+    else if (status === 'Selesai') className = 'bg-green-100 text-green-800 border-green-200';
+    else if (status === 'Ditolak') className = 'bg-red-100 text-red-800 border-red-200';
   }
-  return '<span class="badge ' + className + '">' + status + '</span>';
+  
+  return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${className}">${status}</span>`;
 }
 
 // =====================================================
@@ -462,10 +392,10 @@ function getStatusBadge(status, type) {
 // =====================================================
 function ambilLokasi() {
   const info = document.getElementById('lokasiInfo');
-  info.innerHTML = '⏳ Sedang mengambil lokasi...';
+  info.innerHTML = '<span class="spinner"></span> Sedang mengambil lokasi...';
   
   if (!navigator.geolocation) {
-    info.innerHTML = ' Perangkat tidak mendukung GPS.';
+    info.innerHTML = '<span class="text-red-500">❌ Perangkat tidak mendukung GPS.</span>';
     return;
   }
   
@@ -475,10 +405,10 @@ function ambilLokasi() {
       const lng = position.coords.longitude;
       document.getElementById('latitude').value = lat;
       document.getElementById('longitude').value = lng;
-      info.innerHTML = '✅ Lokasi berhasil diambil<br><strong>Lat:</strong> ' + lat + '<br><strong>Lng:</strong> ' + lng;
+      info.innerHTML = `<span class="text-green-600 font-bold">✅ Lokasi berhasil diambil</span><br><strong>Lat:</strong> ${lat}<br><strong>Lng:</strong> ${lng}`;
     },
     function(error) {
-      info.innerHTML = '❌ Gagal mengambil lokasi. Izinkan akses GPS.';
+      info.innerHTML = '<span class="text-red-500">❌ Gagal mengambil lokasi. Izinkan akses GPS.</span>';
     },
     { enableHighAccuracy: true, timeout: 15000 }
   );
@@ -506,7 +436,7 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   const lng = document.getElementById('longitude').value;
   
   if (!lat || !lng) {
-    showAlert('formAlert', '️ Silakan ambil lokasi terlebih dahulu.', 'error');
+    showAlert('formAlert', '⚠️ Silakan ambil lokasi terlebih dahulu.', 'error');
     return;
   }
   
@@ -543,8 +473,9 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   };
   
   const tombol = e.target.querySelector('button[type="submit"]');
+  const originalText = tombol.innerHTML;
   tombol.disabled = true;
-  tombol.innerHTML = '⏳ Mengirim...';
+  tombol.innerHTML = '<span class="spinner"></span> Mengirim...';
   
   try {
     const response = await fetch(URL_APPS_SCRIPT, {
@@ -564,7 +495,7 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
     showAlert('formAlert', '❌ Gagal: ' + err.message, 'error');
   } finally {
     tombol.disabled = false;
-    tombol.innerHTML = '📤 KIRIM ADUAN';
+    tombol.innerHTML = originalText;
   }
 });
 
@@ -582,7 +513,7 @@ function cariAduan() {
   }
   
   btn.disabled = true;
-  btn.innerHTML = '⏳ Mencari...';
+  btn.innerHTML = '<span class="spinner"></span> Mencari...';
   resultDiv.innerHTML = '';
   
   fetch(URL_APPS_SCRIPT + '?action=getAduanByHp&hp=' + encodeURIComponent(hp))
@@ -597,26 +528,29 @@ function cariAduan() {
       }
       
       if (!data.data || data.data.length === 0) {
-        showAlert('trackingAlert', '️ Tidak ada aduan dengan nomor tersebut.', 'error');
+        showAlert('trackingAlert', 'ℹ️ Tidak ada aduan dengan nomor tersebut.', 'info');
         return;
       }
       
-      let html = '<div class="tracking-result">';
+      let html = '';
       data.data.forEach((aduan, idx) => {
-        html += '<div style="margin-bottom: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd;">';
-        html += '<h3 style="color: #1F6366; margin-bottom: 10px;">Aduan #' + aduan.nomor + '</h3>';
-        html += '<div class="info-row"><div class="info-label">Tanggal:</div><div>' + formatDate(aduan.tanggal) + '</div></div>';
-        html += '<div class="info-row"><div class="info-label">Nama:</div><div>' + aduan.nama + '</div></div>';
-        html += '<div class="info-row"><div class="info-label">Lokasi:</div><div>' + aduan.ruas + '</div></div>';
-        html += '<div class="info-row"><div class="info-label">Deskripsi:</div><div>' + aduan.uraian + '</div></div>';
-        html += '<div class="info-row"><div class="info-label">Status Verifikasi:</div><div>' + getStatusBadge(aduan.statusVerifikasi, 'verif') + '</div></div>';
-        html += '<div class="info-row"><div class="info-label">Status Penanganan:</div><div>' + getStatusBadge(aduan.statusPenanganan, 'handle') + '</div></div>';
-        if (aduan.tanggalValidasi) html += '<div class="info-row"><div class="info-label">Tanggal Validasi:</div><div>' + formatDate(aduan.tanggalValidasi) + '</div></div>';
-        if (aduan.divalidasiOleh) html += '<div class="info-row"><div class="info-label">Divalidasi Oleh:</div><div>' + aduan.divalidasiOleh + '</div></div>';
-        if (aduan.keterangan) html += '<div class="info-row"><div class="info-label">Keterangan:</div><div style="background: #fff3cd; padding: 10px; border-radius: 5px;">' + aduan.keterangan + '</div></div>';
-        html += '</div>';
+        html += `
+          <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start mb-2">
+              <h3 class="font-bold text-primary text-lg">Aduan #${aduan.nomor}</h3>
+              <span class="text-xs text-gray-400">${formatDate(aduan.tanggal)}</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+              <div><strong>Nama:</strong> ${aduan.nama}</div>
+              <div><strong>Lokasi:</strong> ${aduan.ruas}</div>
+              <div class="col-span-2"><strong>Deskripsi:</strong> ${aduan.uraian}</div>
+              <div><strong>Verifikasi:</strong> ${getStatusBadge(aduan.statusVerifikasi, 'verif')}</div>
+              <div><strong>Penanganan:</strong> ${getStatusBadge(aduan.statusPenanganan, 'handle')}</div>
+            </div>
+            ${aduan.keterangan ? `<div class="mt-2 p-2 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 text-sm"><strong>Keterangan:</strong> ${aduan.keterangan}</div>` : ''}
+          </div>
+        `;
       });
-      html += '</div>';
       resultDiv.innerHTML = html;
       
     })
@@ -663,19 +597,19 @@ function showAdminDashboard() {
 
 function loadDataAdmin() {
   const tbody = document.getElementById('adminTableBody');
-  tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">⏳ Memuat data...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="11" class="px-4 py-8 text-center text-gray-500"><span class="spinner"></span> Memuat data...</td></tr>';
   
   fetch(URL_APPS_SCRIPT + '?action=getAllAduan')
     .then(res => res.json())
     .then(data => {
       if (!data.berhasil) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;"> ' + data.pesan + '</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="11" class="px-4 py-8 text-center text-red-500">❌ ${data.pesan}</td></tr>`;
         return;
       }
       renderAdminTable(data.data);
     })
     .catch(err => {
-      tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;">❌ Error: ' + err.message + '</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="11" class="px-4 py-8 text-center text-red-500">❌ Error: ${err.message}</td></tr>`;
     });
 }
 
@@ -684,7 +618,7 @@ function renderAdminTable(data) {
   tbody.innerHTML = '';
   
   if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="11" class="px-4 py-8 text-center text-gray-500">Tidak ada data</td></tr>';
     return;
   }
   
@@ -692,20 +626,21 @@ function renderAdminTable(data) {
     const tr = document.createElement('tr');
     tr.id = 'row-' + row.rowIndex;
     tr.dataset.rowIndex = row.rowIndex;
+    tr.className = 'hover:bg-gray-50 transition-colors';
     
     tr.innerHTML = `
-      <td>${row.nomor}</td>
-      <td>${formatDate(row.tanggal)}</td>
-      <td>${row.nama}</td>
-      <td>${row.hp}</td>
-      <td>${row.ruas}</td>
-      <td title="${row.uraian}">${row.uraian ? row.uraian.substring(0, 50) + (row.uraian.length > 50 ? '...' : '') : '-'}</td>
-      <td class="view-mode">${getStatusBadge(row.statusVerifikasi, 'verif')}</td>
-      <td class="view-mode">${getStatusBadge(row.statusPenanganan, 'handle')}</td>
-      <td class="view-mode">${formatDate(row.tanggalValidasi)}</td>
-      <td class="view-mode">${row.keterangan || '-'}</td>
-      <td>
-        <button class="btn-warning btn-edit" onclick="enableEdit(${row.rowIndex})" style="padding: 6px 10px; font-size: 12px;">✏️ Edit</button>
+      <td class="px-4 py-3 whitespace-nowrap">${row.nomor}</td>
+      <td class="px-4 py-3 whitespace-nowrap">${formatDate(row.tanggal)}</td>
+      <td class="px-4 py-3">${row.nama}</td>
+      <td class="px-4 py-3">${row.hp}</td>
+      <td class="px-4 py-3">${row.ruas}</td>
+      <td class="px-4 py-3 max-w-xs truncate" title="${row.uraian}">${row.uraian ? row.uraian.substring(0, 50) + (row.uraian.length > 50 ? '...' : '') : '-'}</td>
+      <td class="px-4 py-3 view-mode">${getStatusBadge(row.statusVerifikasi, 'verif')}</td>
+      <td class="px-4 py-3 view-mode">${getStatusBadge(row.statusPenanganan, 'handle')}</td>
+      <td class="px-4 py-3 view-mode">${formatDate(row.tanggalValidasi)}</td>
+      <td class="px-4 py-3 view-mode">${row.keterangan || '-'}</td>
+      <td class="px-4 py-3 text-center">
+        <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-xs font-bold transition-colors" onclick="enableEdit(${row.rowIndex})">✏️ Edit</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -717,54 +652,63 @@ function enableEdit(rowIndex) {
   const tr = document.getElementById('row-' + rowIndex);
   if (!tr) return;
   
-  // Ambil data saat ini dari cell
   const cells = tr.querySelectorAll('td');
   const currentVerif = cells[6].innerText.trim();
   const currentHandle = cells[7].innerText.trim();
   const currentTanggal = cells[8].innerText.trim();
   const currentKeterangan = cells[9].innerText.trim();
   
-  // Ubah cell menjadi input
-  cells[6].className = 'edit-mode';
+  // Helper for select options
+  const getSelectedAttr = (val, curr) => val === curr ? 'selected' : '';
+
+  cells[6].className = 'edit-mode px-4 py-2';
   cells[6].innerHTML = `
-    <select class="edit-verif" style="width: 100%; padding: 6px;">
-      <option value="Belum Diverifikasi" ${currentVerif === 'Belum Diverifikasi' ? 'selected' : ''}>Belum Diverifikasi</option>
-      <option value="Valid" ${currentVerif === 'Valid' ? 'selected' : ''}>Valid</option>
-      <option value="Tidak Valid" ${currentVerif === 'Tidak Valid' ? 'selected' : ''}>Tidak Valid</option>
+    <select class="edit-verif w-full p-1 border border-primary rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary">
+      <option value="Belum Diverifikasi" ${getSelectedAttr('Belum Diverifikasi', currentVerif)}>Belum Diverifikasi</option>
+      <option value="Valid" ${getSelectedAttr('Valid', currentVerif)}>Valid</option>
+      <option value="Tidak Valid" ${getSelectedAttr('Tidak Valid', currentVerif)}>Tidak Valid</option>
     </select>
   `;
   
-  cells[7].className = 'edit-mode';
+  cells[7].className = 'edit-mode px-4 py-2';
   cells[7].innerHTML = `
-    <select class="edit-handle" style="width: 100%; padding: 6px;">
-      <option value="Belum Ditangani" ${currentHandle === 'Belum Ditangani' ? 'selected' : ''}>Belum Ditangani</option>
-      <option value="Proses" ${currentHandle === 'Proses' ? 'selected' : ''}>Proses</option>
-      <option value="Selesai" ${currentHandle === 'Selesai' ? 'selected' : ''}>Selesai</option>
-      <option value="Ditolak" ${currentHandle === 'Ditolak' ? 'selected' : ''}>Ditolak</option>
+    <select class="edit-handle w-full p-1 border border-primary rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary">
+      <option value="Belum Ditangani" ${getSelectedAttr('Belum Ditangani', currentHandle)}>Belum Ditangani</option>
+      <option value="Proses" ${getSelectedAttr('Proses', currentHandle)}>Proses</option>
+      <option value="Selesai" ${getSelectedAttr('Selesai', currentHandle)}>Selesai</option>
+      <option value="Ditolak" ${getSelectedAttr('Ditolak', currentHandle)}>Ditolak</option>
     </select>
   `;
   
-  cells[8].className = 'edit-mode';
-  cells[8].innerHTML = `<input type="date" class="edit-tanggal" style="width: 100%; padding: 6px;">`;
+  cells[8].className = 'edit-mode px-4 py-2';
+  cells[8].innerHTML = `<input type="date" class="edit-tanggal w-full p-1 border border-primary rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary">`;
   
-  cells[9].className = 'edit-mode';
-  cells[9].innerHTML = `<input type="text" class="edit-keterangan" placeholder="Masukkan keterangan" style="width: 100%; padding: 6px;" value="${currentKeterangan === '-' ? '' : currentKeterangan}">`;
+  cells[9].className = 'edit-mode px-4 py-2';
+  cells[9].innerHTML = `<input type="text" class="edit-keterangan w-full p-1 border border-primary rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Keterangan" value="${currentKeterangan === '-' ? '' : currentKeterangan}">`;
   
   cells[10].innerHTML = `
-    <button class="btn-success btn-save" onclick="saveRow(${rowIndex})" style="padding: 6px 10px; font-size: 12px;">💾 Simpan</button>
-    <button class="btn-secondary btn-cancel" onclick="loadDataAdmin()" style="padding: 6px 10px; font-size: 12px;"> Batal</button>
+    <div class="flex justify-center gap-1">
+      <button class="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs font-bold transition-colors" onclick="saveRow(${rowIndex})">💾 Simpan</button>
+      <button class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs font-bold transition-colors" onclick="loadDataAdmin()">Batal</button>
+    </div>
   `;
 }
 
-// Simpan perubahan satu baris
 // Simpan perubahan satu baris
 function saveRow(rowIndex) {
   const tr = document.getElementById('row-' + rowIndex);
   if (!tr) return;
   
-  const btn = tr.querySelector('.btn-save');
-  btn.disabled = true;
-  btn.innerHTML = '⏳...';
+  const btn = tr.querySelector('.btn-save'); // Note: The button doesn't have this class in the new HTML structure above, using querySelector by text or adding class is better. 
+  // Let's assume we add a class 'btn-save-action' to the button in enableEdit for easier selection.
+  // For now, selecting the first button in the action cell.
+  const actionCell = tr.cells[10];
+  const saveBtn = actionCell.querySelector('button.bg-green-600'); 
+  
+  if(saveBtn) {
+     saveBtn.disabled = true;
+     saveBtn.innerHTML = '⏳...';
+  }
   
   const data = {
     action: 'updateAduan',
@@ -772,7 +716,7 @@ function saveRow(rowIndex) {
     statusVerifikasi: tr.querySelector('.edit-verif').value,
     statusPenanganan: tr.querySelector('.edit-handle').value,
     tanggalValidasi: tr.querySelector('.edit-tanggal').value,
-    divalidasiOleh: currentUser || 'Admin',  // Tambahkan ini
+    divalidasiOleh: currentUser || 'Admin',
     keterangan: tr.querySelector('.edit-keterangan').value,
     updatedBy: currentUser
   };
@@ -786,8 +730,10 @@ function saveRow(rowIndex) {
   .then(result => {
     if (!result.berhasil) {
       showAlert('adminAlert', '❌ Gagal: ' + result.pesan, 'error');
-      btn.disabled = false;
-      btn.innerHTML = '💾 Simpan';
+      if(saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '💾 Simpan';
+      }
       return;
     }
     showAlert('adminAlert', '✅ Data berhasil diupdate!', 'success');
@@ -795,8 +741,10 @@ function saveRow(rowIndex) {
   })
   .catch(err => {
     showAlert('adminAlert', '❌ Error: ' + err.message, 'error');
-    btn.disabled = false;
-    btn.innerHTML = '💾 Simpan';
+    if(saveBtn) {
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '💾 Simpan';
+    }
   });
 }
 
@@ -805,7 +753,7 @@ function applyFilter() {
   const filterHandle = document.getElementById('filterHandle').value;
   
   const tbody = document.getElementById('adminTableBody');
-  tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;"> Memfilter...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="11" class="px-4 py-8 text-center text-gray-500"><span class="spinner"></span> Memfilter...</td></tr>';
   
   fetch(URL_APPS_SCRIPT + '?action=getAllAduan&filterVerif=' + encodeURIComponent(filterVerif) + '&filterHandle=' + encodeURIComponent(filterHandle))
     .then(res => res.json())
@@ -817,7 +765,8 @@ function applyFilter() {
 // Auto-login jika sudah login sebelumnya
 if (localStorage.getItem('adminLogged')) {
   currentUser = localStorage.getItem('adminUser') || 'admin';
-  showAdminDashboard();
+  // We don't automatically switch tab to admin on load, but we prepare state.
+  // User must click Admin nav to see dashboard.
 }
 </script>
 
