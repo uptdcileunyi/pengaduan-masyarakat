@@ -239,7 +239,7 @@ html{scroll-behavior:smooth}
 body{font-family:Inter,"Segoe UI",system-ui,-apple-system,Arial,sans-serif;background:radial-gradient(ellipse at top left,rgba(31,99,102,.07),transparent 34rem),var(--page);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
 .navbar{padding:14px clamp(16px,4vw,42px);gap:18px;background:rgba(31,99,102,.97);backdrop-filter:blur(14px);box-shadow:0 5px 22px rgba(13,53,55,.16);border-bottom:1px solid rgba(255,255,255,.13)}
 .navbar h1{font-size:clamp(17px,2vw,21px);font-weight:750;letter-spacing:-.35px;white-space:nowrap}
-.nav-menu{gap:8px}.nav-btn{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.10);padding:10px 15px;border-radius:10px;font-weight:650;font-size:13px;white-space:nowrap}
+.nav-menu{gap:8px}.notification-btn{position:relative;display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.22);padding:10px 13px;border-radius:10px;font-weight:700;font-size:13px;white-space:nowrap}.notification-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;background:#dc3545;color:#fff;font-size:11px;font-weight:800;line-height:1}.notification-count[hidden]{display:none}.notification-btn:hover{background:rgba(255,255,255,.24)}.nav-btn{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.10);padding:10px 15px;border-radius:10px;font-weight:650;font-size:13px;white-space:nowrap}
 .nav-btn:hover{transform:translateY(-1px)}.nav-btn.active{background:white;color:var(--brand);box-shadow:0 3px 10px rgba(0,0,0,.10)}
 .container{max-width:1160px;margin:34px auto 56px;padding:0 clamp(14px,3vw,28px)}
 .section{animation:sectionEnter .28s ease both}@keyframes sectionEnter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
@@ -271,7 +271,7 @@ tbody tr:nth-child(even){background:#fbfdfd}tbody tr:hover{background:#f0f8f8}tb
 .info-row{border-bottom:1px solid #edf1f2}.info-label{color:#657579;font-size:12px;text-transform:uppercase;letter-spacing:.45px;margin-bottom:3px}
 .edit-mode{background:#fff9c4!important}.edit-mode select,.edit-mode input{min-width:120px;border-color:var(--brand);border-radius:7px}
 .modal-content{box-shadow:0 22px 70px rgba(0,0,0,.22);border:1px solid var(--line)}::selection{background:rgba(31,99,102,.18)}
-@media(max-width:768px){.navbar{align-items:stretch;gap:12px;padding:14px 16px}.navbar h1{white-space:normal;text-align:center}.nav-menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.nav-btn{padding:10px 6px;font-size:12px}.container{margin:20px auto 36px;padding:0 12px}.card{border-radius:14px;padding:19px 16px}.card h2{font-size:20px}.filter-row{flex-direction:column;align-items:stretch}.filter-col{width:100%;min-width:0}#adminDashboard .card>div:first-child{align-items:flex-start!important}#adminDashboard .card>div:first-child>div{display:flex;gap:6px;flex-wrap:wrap}#adminDashboard .card>div:first-child button{margin-top:0}.login-box{margin:20px auto}.tracking-result>div{padding:13px!important}}
+@media(max-width:768px){.navbar{align-items:stretch;gap:12px;padding:14px 16px}.navbar h1{white-space:normal;text-align:center}.nav-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.nav-btn,.notification-btn{justify-content:center;padding:10px 6px;font-size:12px}.container{margin:20px auto 36px;padding:0 12px}.card{border-radius:14px;padding:19px 16px}.card h2{font-size:20px}.filter-row{flex-direction:column;align-items:stretch}.filter-col{width:100%;min-width:0}#adminDashboard .card>div:first-child{align-items:flex-start!important}#adminDashboard .card>div:first-child>div{display:flex;gap:6px;flex-wrap:wrap}#adminDashboard .card>div:first-child button{margin-top:0}.login-box{margin:20px auto}.tracking-result>div{padding:13px!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
   </style>
@@ -286,6 +286,7 @@ tbody tr:nth-child(even){background:#fbfdfd}tbody tr:hover{background:#f0f8f8}tb
     <button class="nav-btn active" onclick="showSection('form', this)">📝 Form Aduan</button>
     <button class="nav-btn" onclick="showSection('tracking', this)">🔍 Cek Status</button>
     <button class="nav-btn" onclick="showSection('admin', this)">⚙️ Admin</button>
+    <button class="notification-btn" id="btnAduanMasuk" onclick="bukaAduanMasuk()" title="Lihat aduan yang belum diverifikasi">🔔 Aduan Masuk <span class="notification-count" id="notificationCount" hidden>0</span></button>
   </div>
 </nav>
 
@@ -450,6 +451,9 @@ tbody tr:nth-child(even){background:#fbfdfd}tbody tr:hover{background:#f0f8f8}tb
 const URL_APPS_SCRIPT = 'https://script.google.com/macros/s/AKfycbwAq-VE48gK_-1-9wvt48p1ZOERmwEoVOh3pr7YP4-259hb2csWUBqWFsL0nWqLG-qZKw/exec';
 let currentUser = localStorage.getItem('adminUser') || '';
 let adminToken = localStorage.getItem('adminToken') || '';
+let notificationTimer = null;
+let knownAduanIds = null;
+let notificationPolling = false;
 
 // =====================================================
 // NAVIGASI SECTION
@@ -464,6 +468,107 @@ function showSection(section, button) {
   if (section === 'admin' && localStorage.getItem('adminLogged')) {
     showAdminDashboard();
     loadDataAdmin();
+  }
+}
+
+// =====================================================
+// NOTIFIKASI ADUAN MASUK
+// Memeriksa API setiap 30 detik saat sesi admin tersedia.
+// =====================================================
+function getAduanId(row) {
+  return String(row.rowIndex || row.nomor || '') + '|' + String(row.tanggal || '') + '|' + String(row.hp || '') + '|' + String(row.ruas || '');
+}
+
+function isBelumDiverifikasi(row) {
+  const status = String(row.statusVerifikasi || '').trim();
+  return !status || status === 'Belum Diverifikasi';
+}
+
+function updateNotificationCount(data) {
+  const count = (data || []).filter(isBelumDiverifikasi).length;
+  const badge = document.getElementById('notificationCount');
+  if (!badge) return;
+  badge.textContent = count > 99 ? '99+' : String(count);
+  badge.hidden = count === 0;
+  document.getElementById('btnAduanMasuk')?.setAttribute('aria-label', 'Aduan Masuk, ' + count + ' aduan belum diverifikasi');
+}
+
+function bunyikanNotifikasi() {
+  // Browser dapat membatasi suara sebelum ada interaksi pengguna.
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+    oscillator.frequency.setValueAtTime(660, ctx.currentTime + 0.16);
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.025);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.42);
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.44);
+    oscillator.onended = () => ctx.close();
+  } catch (e) { /* Notifikasi visual tetap berfungsi jika audio diblokir. */ }
+}
+
+async function periksaAduanBaru() {
+  if (!adminToken || notificationPolling) return;
+  notificationPolling = true;
+  try {
+    const response = await fetch(URL_APPS_SCRIPT + '?action=getAllAduan&token=' + encodeURIComponent(adminToken));
+    const result = await response.json();
+    if (!result.berhasil || !Array.isArray(result.data)) return;
+    const rows = result.data;
+    updateNotificationCount(rows);
+    const currentIds = new Set(rows.map(getAduanId));
+    if (knownAduanIds !== null) {
+      const newRows = rows.filter(row => !knownAduanIds.has(getAduanId(row)));
+      if (newRows.length > 0) {
+        bunyikanNotifikasi();
+        const jumlah = newRows.length;
+        showAlert('adminAlert', '🔔 Ada ' + jumlah + ' aduan baru masuk. Silakan periksa menu Aduan Masuk.', 'info');
+      }
+    }
+    knownAduanIds = currentIds;
+  } catch (e) {
+    // Kegagalan satu kali pemeriksaan tidak mengganggu fitur lain.
+  } finally {
+    notificationPolling = false;
+  }
+}
+
+function mulaiPemantauanAduan() {
+  if (!adminToken) return;
+  if (notificationTimer) clearInterval(notificationTimer);
+  knownAduanIds = null;
+  periksaAduanBaru(); // Pemeriksaan awal tidak membunyikan notifikasi.
+  notificationTimer = setInterval(periksaAduanBaru, 30000);
+}
+
+function hentikanPemantauanAduan() {
+  if (notificationTimer) clearInterval(notificationTimer);
+  notificationTimer = null;
+  knownAduanIds = null;
+}
+
+function bukaAduanMasuk() {
+  document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(button => button.classList.remove('active'));
+  document.getElementById('section-admin').classList.add('active');
+  document.querySelector('.nav-btn[onclick*="admin"]')?.classList.add('active');
+  if (adminToken) {
+    showAdminDashboard();
+    document.getElementById('filterVerif').value = 'Belum Diverifikasi';
+    document.getElementById('filterHandle').value = '';
+    applyFilter();
+  } else {
+    document.getElementById('adminLogin').style.display = 'block';
+    document.getElementById('adminDashboard').style.display = 'none';
+    showAlert('loginAlert', 'Silakan login sebagai admin untuk melihat aduan masuk.', 'info');
   }
 }
 
@@ -695,6 +800,7 @@ async function loginAdmin() {
     localStorage.setItem('adminUser', currentUser);
     showAdminDashboard();
     loadDataAdmin();
+    mulaiPemantauanAduan();
     document.getElementById('password').value = '';
   } catch (err) {
     showAlert('loginAlert', '❌ Login gagal menghubungi server: ' + err.message, 'error');
@@ -713,6 +819,8 @@ async function logoutAdmin() {
   } catch (err) {
     // Token tetap dihapus dari browser walaupun permintaan logout gagal.
   }
+  hentikanPemantauanAduan();
+  updateNotificationCount([]);
   localStorage.removeItem('adminToken');
   localStorage.removeItem('adminUser');
   localStorage.removeItem('adminLogged');
@@ -887,6 +995,7 @@ function applyFilter() {
 // Backend tetap memvalidasi token setiap kali API admin dipanggil.
 if (adminToken) {
   showAdminDashboard();
+  mulaiPemantauanAduan();
 }
 </script>
 
