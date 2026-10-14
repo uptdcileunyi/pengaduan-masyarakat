@@ -923,8 +923,17 @@ function enableEdit(rowIndex) {
   cells[8].className = 'edit-mode';
   cells[8].innerHTML = `<input type="date" class="edit-tanggal" style="width: 100%; padding: 6px;">`;
   
-  cells[9].className = 'edit-mode';
-  cells[9].innerHTML = `<input type="text" class="edit-keterangan" placeholder="Masukkan keterangan" style="width: 100%; padding: 6px;" value="${currentKeterangan === '-' ? '' : currentKeterangan}">`;
+    cells[9].className = 'edit-mode';
+   cells[9].innerHTML = `
+     <div style="margin-bottom: 8px;">
+       <label style="font-size: 11px; font-weight: bold; color: #1F6366;">Nama Verifikator:</label>
+       <input type="text" class="edit-verifikator" placeholder="Cth: Budi (Lapangan)" style="width: 100%; padding: 6px; font-size: 12px;" value="">
+     </div>
+     <div>
+       <label style="font-size: 11px; font-weight: bold; color: #1F6366;">Keterangan / Catatan:</label>
+       <input type="text" class="edit-keterangan" placeholder="Catatan tambahan" style="width: 100%; padding: 6px; font-size: 12px;" value="${currentKeterangan === '-' ? '' : currentKeterangan}">
+     </div>
+   `;
   
   cells[10].innerHTML = `
     <button class="btn-success btn-save" onclick="saveRow(${rowIndex})" style="padding: 6px 10px; font-size: 12px;">💾 Simpan</button>
@@ -942,17 +951,18 @@ function saveRow(rowIndex) {
   btn.disabled = true;
   btn.innerHTML = '⏳...';
   
-  const data = {
-    action: 'updateAduan',
-    token: adminToken,
-    rowIndex: rowIndex,
-    statusVerifikasi: tr.querySelector('.edit-verif').value,
-    statusPenanganan: tr.querySelector('.edit-handle').value,
-    tanggalValidasi: tr.querySelector('.edit-tanggal').value,
-    divalidasiOleh: currentUser || 'Admin',  // Tambahkan ini
-    keterangan: tr.querySelector('.edit-keterangan').value,
-    updatedBy: currentUser
-  };
+   const data = {
+     action: 'updateAduan',
+     token: adminToken,
+     rowIndex: rowIndex,
+     statusVerifikasi: tr.querySelector('.edit-verif').value,
+     statusPenanganan: tr.querySelector('.edit-handle').value,
+     tanggalValidasi: tr.querySelector('.edit-tanggal').value,
+     // Ambil dari input manual, jika kosong gunakan username yang sedang login
+     divalidasiOleh: tr.querySelector('.edit-verifikator').value || currentUser,
+     keterangan: tr.querySelector('.edit-keterangan').value,
+     updatedBy: currentUser
+   };
   
   fetch(URL_APPS_SCRIPT, {
     method: 'POST',
