@@ -949,20 +949,25 @@ function saveRow(rowIndex) {
   
   const btn = tr.querySelector('.btn-save');
   btn.disabled = true;
-  btn.innerHTML = '⏳...';
+  btn.innerHTML = '⏳ Menyimpan...';
   
-   const data = {
-     action: 'updateAduan',
-     token: adminToken,
-     rowIndex: rowIndex,
-     statusVerifikasi: tr.querySelector('.edit-verif').value,
-     statusPenanganan: tr.querySelector('.edit-handle').value,
-     tanggalValidasi: tr.querySelector('.edit-tanggal').value,
-     // Ambil dari input manual, jika kosong gunakan username yang sedang login
-     divalidasiOleh: tr.querySelector('.edit-verifikator').value || currentUser,
-     keterangan: tr.querySelector('.edit-keterangan').value,
-     updatedBy: currentUser
-   };
+  // Ambil nilai dari input manual
+  const inputVerifikator = tr.querySelector('.edit-verifikator').value.trim();
+  
+  // Jika admin mengisi nama, pakai itu. Jika dikosongkan, pakai username yang sedang login
+  const namaVerifikatorFinal = (inputVerifikator !== "") ? inputVerifikator : currentUser;
+  
+  const data = {
+    action: 'updateAduan',
+    token: adminToken,
+    rowIndex: rowIndex,
+    statusVerifikasi: tr.querySelector('.edit-verif').value,
+    statusPenanganan: tr.querySelector('.edit-handle').value,
+    tanggalValidasi: tr.querySelector('.edit-tanggal').value,
+    divalidasiOleh: namaVerifikatorFinal, // Kirim nama yang sudah dipastikan
+    keterangan: tr.querySelector('.edit-keterangan').value,
+    updatedBy: currentUser
+  };
   
   fetch(URL_APPS_SCRIPT, {
     method: 'POST',
@@ -977,8 +982,8 @@ function saveRow(rowIndex) {
       btn.innerHTML = '💾 Simpan';
       return;
     }
-    showAlert('adminAlert', '✅ Data berhasil diupdate!', 'success');
-    loadDataAdmin();
+    showAlert('adminAlert', '✅ Data berhasil diupdate oleh: ' + result.updatedBy, 'success');
+    loadDataAdmin(); // Refresh tabel
   })
   .catch(err => {
     showAlert('adminAlert', '❌ Error: ' + err.message, 'error');
