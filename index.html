@@ -263,7 +263,7 @@ button:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 5px 13px rgb
 .table-responsive{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:18px;background:white}
 table{border-collapse:separate;border-spacing:0;margin-top:0;min-width:1050px;font-size:13px}
 th,td{padding:13px 14px;border-bottom:1px solid #edf1f2;vertical-align:top}
-th{background:var(--brand);font-size:12px;letter-spacing:.25px;font-weight:750;white-space:nowrap;z-index:2}
+th{background:var(--brand);font-size:12px;letter-spacing:.25px;font-weight:700;white-space:nowrap;z-index:2}
 tbody tr:nth-child(even){background:#fbfdfd}tbody tr:hover{background:#f0f8f8}tbody tr:last-child td{border-bottom:0}
 .badge{padding:5px 10px;border-radius:7px;font-size:11px;line-height:1.4;white-space:nowrap;letter-spacing:.1px}
 .tracking-result{background:#f6f9f9;border:1px solid var(--line);padding:clamp(14px,2.5vw,22px);border-radius:14px}
@@ -309,20 +309,30 @@ tbody tr:nth-child(even){background:#fbfdfd}tbody tr:hover{background:#f0f8f8}tb
         <label>Kontak/WhatsApp <span style="color:red">*</span></label>
         <input type="tel" id="hp" required placeholder="08xxxxxxxxxx">
 
+        <label>Alamat Pelapor</label>
+        <input type="text" id="alamat" placeholder="Alamat lengkap (opsional)">
+
+        <label>NIK (Nomor Induk Kependudukan)</label>
+        <input type="text" id="nik" placeholder="16 digit NIK (opsional)" maxlength="16">
+        <div style="font-size: 12px; color: #666; margin-top: 3px;">* Opsional - boleh dikosongkan jika tidak berkenan</div>
+
         <label>Ruas/Lokasi Jalan <span style="color:red">*</span></label>
         <input type="text" id="ruas" required placeholder="Contoh: Jl. Cibiru – Cinunuk">
+        <label>Kecamatan <span style="color:red">*</span></label>
+        <select id="kecamatan" required onchange="filterDesaByKecamatan()">
+          <option value="">-- Memuat Data --</option>
+        </select>
 
-        <label>Kecamatan</label>
-        <input type="text" id="kecamatan" placeholder="Contoh: Cileunyi">
-
-        <label>Desa/Kelurahan</label>
-        <input type="text" id="desa" placeholder="Contoh: Cinunuk">
+        <label>Desa/Kelurahan <span style="color:red">*</span></label>
+        <select id="desa" required disabled>
+          <option value="">-- Pilih Kecamatan Terlebih Dahulu --</option>
+        </select>
 
         <label>Deskripsi Kerusakan <span style="color:red">*</span></label>
         <textarea id="uraian" required placeholder="Jelaskan kondisi kerusakan (berlubang, retak, amblas, dll)"></textarea>
 
         <label>Lokasi GPS <span style="color:red">*</span></label>
-        <button type="button" class="btn-location" onclick="ambilLokasi()">📍 Ambil Lokasi Saya</button>
+        <button type="button" class="btn-location" onclick="ambilLokasi()"> Ambil Lokasi Saya</button>
         <div id="lokasiInfo" style="margin-top: 10px; padding: 10px; background: #eef7f7; border-radius: 8px; font-size: 14px;">
           Lokasi belum diambil.
         </div>
@@ -383,7 +393,7 @@ tbody tr:nth-child(even){background:#fbfdfd}tbody tr:hover{background:#f0f8f8}tb
           <h2 style="margin: 0;">📊 Dashboard Admin - Verifikasi Lapangan</h2>
           <div>
             <button class="btn-secondary" onclick="logoutAdmin()">Logout</button>
-            <button class="btn-primary" onclick="loadDataAdmin()">🔄 Refresh</button>
+            <button class="btn-primary" onclick="loadDataAdmin()"> Refresh</button>
           </div>
         </div>
 
@@ -425,6 +435,8 @@ tbody tr:nth-child(even){background:#fbfdfd}tbody tr:hover{background:#f0f8f8}tb
                 <th>Tanggal</th>
                 <th>Nama</th>
                 <th>Kontak</th>
+                <th>Alamat</th>
+                <th>NIK</th>
                 <th>Lokasi</th>
                 <th>Deskripsi</th>
                 <th>Status Verifikasi</th>
@@ -435,7 +447,7 @@ tbody tr:nth-child(even){background:#fbfdfd}tbody tr:hover{background:#f0f8f8}tb
               </tr>
             </thead>
             <tbody id="adminTableBody">
-              <tr><td colspan="11" style="text-align: center;">Klik "Refresh" untuk memuat data</td></tr>
+              <tr><td colspan="13" style="text-align: center;">Klik "Refresh" untuk memuat data</td></tr>
             </tbody>
           </table>
         </div>
@@ -607,7 +619,7 @@ function getStatusBadge(status, type) {
 // =====================================================
 function ambilLokasi() {
   const info = document.getElementById('lokasiInfo');
-  info.innerHTML = '⏳ Sedang mengambil lokasi...';
+  info.innerHTML = ' Sedang mengambil lokasi...';
   
   if (!navigator.geolocation) {
     info.innerHTML = ' Perangkat tidak mendukung GPS.';
@@ -663,7 +675,7 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   
   const file = fotoInput.files[0];
   if (file.size > 5 * 1024 * 1024) {
-    showAlert('formAlert', '⚠️ Ukuran foto maksimal 5 MB.', 'error');
+    showAlert('formAlert', '️ Ukuran foto maksimal 5 MB.', 'error');
     return;
   }
   
@@ -678,6 +690,8 @@ document.getElementById('formAduan').addEventListener('submit', async function(e
   const data = {
     nama: document.getElementById('nama').value,
     hp: document.getElementById('hp').value,
+    alamat: document.getElementById('alamat').value,  // Alamat Pelapor
+    nik: document.getElementById('nik').value,         // NIK (opsional)
     ruas: document.getElementById('ruas').value,
     kecamatan: document.getElementById('kecamatan').value,
     desa: document.getElementById('desa').value,
@@ -752,6 +766,8 @@ function cariAduan() {
         html += '<h3 style="color: #1F6366; margin-bottom: 10px;">Aduan #' + aduan.nomor + '</h3>';
         html += '<div class="info-row"><div class="info-label">Tanggal:</div><div>' + formatDate(aduan.tanggal) + '</div></div>';
         html += '<div class="info-row"><div class="info-label">Nama:</div><div>' + aduan.nama + '</div></div>';
+        if (aduan.alamat) html += '<div class="info-row"><div class="info-label">Alamat:</div><div>' + aduan.alamat + '</div></div>';
+        if (aduan.nik) html += '<div class="info-row"><div class="info-label">NIK:</div><div>' + aduan.nik + '</div></div>';
         html += '<div class="info-row"><div class="info-label">Lokasi:</div><div>' + aduan.ruas + '</div></div>';
         html += '<div class="info-row"><div class="info-label">Deskripsi:</div><div>' + aduan.uraian + '</div></div>';
         html += '<div class="info-row"><div class="info-label">Status Verifikasi:</div><div>' + getStatusBadge(aduan.statusVerifikasi, 'verif') + '</div></div>';
@@ -767,7 +783,7 @@ function cariAduan() {
     })
     .catch(err => {
       btn.disabled = false;
-      btn.innerHTML = '🔍 CARI ADUAN';
+      btn.innerHTML = ' CARI ADUAN';
       showAlert('trackingAlert', '❌ Error: ' + err.message, 'error');
     });
 }
@@ -839,19 +855,19 @@ function showAdminDashboard() {
 
 function loadDataAdmin() {
   const tbody = document.getElementById('adminTableBody');
-  tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">⏳ Memuat data...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="13" style="text-align: center;"> Memuat data...</td></tr>';
   
   fetch(URL_APPS_SCRIPT + '?action=getAllAduan&token=' + encodeURIComponent(adminToken))
     .then(res => res.json())
     .then(data => {
       if (!data.berhasil) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;"> ' + data.pesan + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align: center; color: red;"> ' + data.pesan + '</td></tr>';
         return;
       }
       renderAdminTable(data.data);
     })
     .catch(err => {
-      tbody.innerHTML = '<tr><td colspan="11" style="text-align: center; color: red;">❌ Error: ' + err.message + '</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="13" style="text-align: center; color: red;">❌ Error: ' + err.message + '</td></tr>';
     });
 }
 
@@ -860,7 +876,7 @@ function renderAdminTable(data) {
   tbody.innerHTML = '';
   
   if (!data || data.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;">Tidak ada data</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="13" style="text-align: center;">Tidak ada data</td></tr>';
     return;
   }
   
@@ -874,6 +890,8 @@ function renderAdminTable(data) {
       <td>${formatDate(row.tanggal)}</td>
       <td>${row.nama}</td>
       <td>${row.hp}</td>
+      <td>${row.alamat || '-'}</td>
+      <td>${row.nik || '-'}</td>
       <td>${row.ruas}</td>
       <td title="${row.uraian}">${row.uraian ? row.uraian.substring(0, 50) + (row.uraian.length > 50 ? '...' : '') : '-'}</td>
       <td class="view-mode">${getStatusBadge(row.statusVerifikasi, 'verif')}</td>
@@ -895,14 +913,14 @@ function enableEdit(rowIndex) {
   
   // Ambil data saat ini dari cell
   const cells = tr.querySelectorAll('td');
-  const currentVerif = cells[6].innerText.trim();
-  const currentHandle = cells[7].innerText.trim();
-  const currentTanggal = cells[8].innerText.trim();
-  const currentKeterangan = cells[9].innerText.trim();
+  const currentVerif = cells[8].innerText.trim();
+  const currentHandle = cells[9].innerText.trim();
+  const currentTanggal = cells[10].innerText.trim();
+  const currentKeterangan = cells[11].innerText.trim();
   
   // Ubah cell menjadi input
-  cells[6].className = 'edit-mode';
-  cells[6].innerHTML = `
+  cells[8].className = 'edit-mode';
+  cells[8].innerHTML = `
     <select class="edit-verif" style="width: 100%; padding: 6px;">
       <option value="Belum Diverifikasi" ${currentVerif === 'Belum Diverifikasi' ? 'selected' : ''}>Belum Diverifikasi</option>
       <option value="Valid" ${currentVerif === 'Valid' ? 'selected' : ''}>Valid</option>
@@ -910,8 +928,8 @@ function enableEdit(rowIndex) {
     </select>
   `;
   
-  cells[7].className = 'edit-mode';
-  cells[7].innerHTML = `
+  cells[9].className = 'edit-mode';
+  cells[9].innerHTML = `
     <select class="edit-handle" style="width: 100%; padding: 6px;">
       <option value="Belum Ditangani" ${currentHandle === 'Belum Ditangani' ? 'selected' : ''}>Belum Ditangani</option>
       <option value="Proses" ${currentHandle === 'Proses' ? 'selected' : ''}>Proses</option>
@@ -920,11 +938,11 @@ function enableEdit(rowIndex) {
     </select>
   `;
   
-  cells[8].className = 'edit-mode';
-  cells[8].innerHTML = `<input type="date" class="edit-tanggal" style="width: 100%; padding: 6px;">`;
+  cells[10].className = 'edit-mode';
+  cells[10].innerHTML = `<input type="date" class="edit-tanggal" style="width: 100%; padding: 6px;">`;
   
-    cells[9].className = 'edit-mode';
-   cells[9].innerHTML = `
+    cells[11].className = 'edit-mode';
+   cells[11].innerHTML = `
      <div style="margin-bottom: 8px;">
        <label style="font-size: 11px; font-weight: bold; color: #1F6366;">Nama Verifikator:</label>
        <input type="text" class="edit-verifikator" placeholder="Cth: Budi (Lapangan)" style="width: 100%; padding: 6px; font-size: 12px;" value="">
@@ -935,13 +953,12 @@ function enableEdit(rowIndex) {
      </div>
    `;
   
-  cells[10].innerHTML = `
-    <button class="btn-success btn-save" onclick="saveRow(${rowIndex})" style="padding: 6px 10px; font-size: 12px;">💾 Simpan</button>
+  cells[12].innerHTML = `
+    <button class="btn-success btn-save" onclick="saveRow(${rowIndex})" style="padding: 6px 10px; font-size: 12px;"> Simpan</button>
     <button class="btn-secondary btn-cancel" onclick="loadDataAdmin()" style="padding: 6px 10px; font-size: 12px;"> Batal</button>
   `;
 }
 
-// Simpan perubahan satu baris
 // Simpan perubahan satu baris
 function saveRow(rowIndex) {
   const tr = document.getElementById('row-' + rowIndex);
@@ -949,7 +966,7 @@ function saveRow(rowIndex) {
   
   const btn = tr.querySelector('.btn-save');
   btn.disabled = true;
-  btn.innerHTML = '⏳ Menyimpan...';
+  btn.innerHTML = ' Menyimpan...';
   
   // Ambil nilai dari input manual
   const inputVerifikator = tr.querySelector('.edit-verifikator').value.trim();
@@ -997,7 +1014,7 @@ function applyFilter() {
   const filterHandle = document.getElementById('filterHandle').value;
   
   const tbody = document.getElementById('adminTableBody');
-  tbody.innerHTML = '<tr><td colspan="11" style="text-align: center;"> Memfilter...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="13" style="text-align: center;"> Memfilter...</td></tr>';
   
   fetch(URL_APPS_SCRIPT + '?action=getAllAduan&token=' + encodeURIComponent(adminToken) + '&filterVerif=' + encodeURIComponent(filterVerif) + '&filterHandle=' + encodeURIComponent(filterHandle))
     .then(res => res.json())
@@ -1012,7 +1029,124 @@ if (adminToken) {
   showAdminDashboard();
   mulaiPemantauanAduan();
 }
+
+// =====================================================
+// VARIABEL GLOBAL UNTUK DATA DESA
+// =====================================================
+let globalDataDesa = [];
+
+// =====================================================
+// FUNGSI MEMUAT DAFTAR DESA SAAT HALAMAN DIBUKA
+// =====================================================
+function loadDaftarDesa() {
+  const selectKec = document.getElementById('kecamatan');
+  const selectDesa = document.getElementById('desa');
+
+  console.log('🔄 Memuat data desa dari server...');
+  
+  selectKec.innerHTML = '<option value="">-- Memuat Data --</option>';
+  selectDesa.innerHTML = '<option value="">-- Menunggu Kecamatan --</option>';
+  selectDesa.disabled = true;
+
+  fetch(URL_APPS_SCRIPT + '?action=getDaftarDesa')
+    .then(res => {
+      console.log('Response status:', res.status);
+      return res.json();
+    })
+    .then(result => {
+      console.log('Data diterima:', result);
+      
+      if (result.berhasil && result.data && result.data.length > 0) {
+        globalDataDesa = result.data;
+        console.log('Jumlah data desa:', globalDataDesa.length);
+
+        // Ambil daftar kecamatan yang unik (tanpa duplikat) dan urutkan
+        const kecUnique = [...new Set(globalDataDesa.map(item => item.kecamatan))].sort();
+        console.log('Kecamatan unik:', kecUnique);
+
+        // Isi dropdown kecamatan
+        selectKec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+        kecUnique.forEach(kec => {
+          const option = document.createElement('option');
+          option.value = kec;
+          option.textContent = kec;
+          selectKec.appendChild(option);
+        });
+        
+        console.log('✅ Dropdown kecamatan berhasil diisi');
+      } else {
+        console.error('❌ Data kosong atau error:', result);
+        selectKec.innerHTML = '<option value="">Data tidak tersedia</option>';
+        selectDesa.innerHTML = '<option value="">Data tidak tersedia</option>';
+        
+        if (result.pesan) {
+          console.warn('Pesan error:', result.pesan);
+          alert('Perhatian: ' + result.pesan);
+        }
+      }
+    })
+    .catch(err => {
+      console.error('❌ Gagal memuat data desa:', err);
+      selectKec.innerHTML = '<option value="">Gagal memuat data</option>';
+      alert('Gagal memuat data kecamatan. Silakan refresh halaman atau periksa koneksi internet.');
+    });
+}
+
+// =====================================================
+// FUNGSI FILTER DESA BERDASARKAN KECAMATAN YANG DIPILIH
+// =====================================================
+function filterDesaByKecamatan() {
+  const selectKec = document.getElementById('kecamatan');
+  const selectDesa = document.getElementById('desa');
+  const selectedKec = selectKec.value;
+
+  console.log('Kecamatan dipilih:', selectedKec);
+  console.log('Total data desa:', globalDataDesa.length);
+
+  // Reset dropdown desa
+  selectDesa.innerHTML = '';
+
+  if (!selectedKec) {
+    selectDesa.innerHTML = '<option value="">-- Pilih Kecamatan Terlebih Dahulu --</option>';
+    selectDesa.disabled = true;
+    return;
+  }
+
+  // Filter data desa yang sesuai dengan kecamatan yang dipilih
+  const filteredDesa = globalDataDesa.filter(item => {
+    const match = item.kecamatan === selectedKec;
+    return match;
+  });
+
+  console.log('Desa yang cocok:', filteredDesa.length, filteredDesa);
+
+  // Isi dropdown desa
+  selectDesa.innerHTML = '<option value="">-- Pilih Desa/Kelurahan --</option>';
+  filteredDesa.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item.desa;
+    option.textContent = item.desa;
+    selectDesa.appendChild(option);
+  });
+  
+  // Aktifkan dropdown desa
+  selectDesa.disabled = false;
+  console.log('✅ Dropdown desa berhasil diisi');
+}
+
+// Panggil fungsi loadDaftarDesa saat halaman selesai dimuat
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('📄 DOM sudah siap, memuat data desa...');
+  loadDaftarDesa();
+});
+
+// Fallback: jika DOMContentLoaded sudah lewat, panggil langsung
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  console.log('⚡ Memuat data desa secara langsung...');
+  setTimeout(loadDaftarDesa, 100);
+}
 </script>
 
 </body>
+
 </html>
